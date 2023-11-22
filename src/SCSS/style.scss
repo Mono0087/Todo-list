@@ -1,0 +1,118 @@
+@import "./reset.css";
+@import "config";
+@import "fonts";
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  background-color: $bg-main;
+  font-family: "Poppins", sans-serif;
+  color: $main-color;
+  font-size: calc(clamp(1rem, 1vw, 38px));
+}
+
+::-webkit-scrollbar {
+  width: 18px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: $main-theme;
+  background-clip: padding-box;
+  border: 5px solid rgba(0, 0, 0, 0);
+  border-radius: 15px;
+  margin-right: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9c7575;
+  background-clip: padding-box;
+  border: 5px solid rgba(0, 0, 0, 0);
+}
+
+ul,
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}
+p {
+  margin: 0;
+}
+button,
+a {
+  transition: all 0.1s;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+h1 {
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
+}
+h2 {
+  font-size: clamp(1.3rem, 5vw, 2.5rem);
+}
+
+%flex-center-rules {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+}
+
+%padding {
+  padding: 15px;
+}
+
+%add-overflow {
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.container {
+  color: $main-theme;
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: max-content auto;
+  color: #fff;
+  grid-template-areas:
+    "header header"
+    "nav main";
+  header {
+    grid-area: header;
+    background-color: $main-theme;
+    text-align: center;
+    @extend %flex-center-rules, %padding;
+  }
+  nav {
+    grid-area: nav;
+    max-width: calc(max(30vw, 170px));
+    background-color: $main-theme-light;
+    @extend %add-overflow, %padding;
+    .projects-list {
+      li {
+        @extend %padding;
+      }
+    }
+  }
+  main {
+    grid-area: main;
+    @extend %add-overflow, %padding;
+  }
+}
