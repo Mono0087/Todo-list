@@ -65,7 +65,8 @@ h1 {
   font-size: clamp(1.8rem, 6vw, 3.5rem);
 }
 h2 {
-  font-size: clamp(1.3rem, 5vw, 2.5rem);
+  font-size: clamp(1.3rem, 2.7vw, 2.5rem);
+  padding: 1.5vh 0;
 }
 
 %flex-center-rules {
@@ -105,10 +106,18 @@ h2 {
     max-width: calc(max(30vw, 170px));
     background-color: $main-theme-light;
     @extend %add-overflow, %padding;
-    .projects-list {
-      li {
-        @extend %padding;
-      }
+  }
+  .projects-list {
+    display: flex;
+    flex-direction: column;
+    text-align-last: left;
+    li {
+      padding: 3px 10px;
+    }
+    button {
+      background-color: transparent;
+      color: #fff;
+      font-size: calc(clamp(1.2rem, 1vw, 40px));
     }
   }
   main {
