@@ -53,6 +53,20 @@ a {
 p {
   margin: 0;
 }
+
+h1 {
+  font-size: clamp(1.8rem, 6vw, 3.5rem);
+}
+h2 {
+  font-size: clamp(1.3rem, 2.7vw, 2.5rem);
+  padding: 1.5vh 0;
+}
+h1,
+h2,
+h3 {
+  font-weight: 700;
+}
+
 button,
 a {
   transition: all 0.1s;
@@ -61,12 +75,23 @@ a {
   }
 }
 
-h1 {
-  font-size: clamp(1.8rem, 6vw, 3.5rem);
-}
-h2 {
-  font-size: clamp(1.3rem, 2.7vw, 2.5rem);
-  padding: 1.5vh 0;
+.btn {
+  padding: 5px 10px;
+  transition: all 0.1s;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border,
+    1px 2px 1px $border, 3px 2px 1px $border, 2px 3px 1px $border;
+  &:active {
+    border: none;
+    box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border;
+    transform: translate(1px, 1px);
+  }
+  &:hover {
+    opacity: 1;
+    color: lighten($color: $main-color, $amount: 10);
+  }
 }
 
 %flex-center-rules {
@@ -85,6 +110,9 @@ h2 {
   overflow-x: hidden;
 }
 
+// STYLES ////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
 .container {
   color: $main-theme;
   width: 100%;
@@ -98,7 +126,7 @@ h2 {
   header {
     grid-area: header;
     background-color: $main-theme;
-    text-align: center;
+    border-bottom: 2px solid $border;
     @extend %flex-center-rules, %padding;
   }
   nav {
@@ -106,22 +134,114 @@ h2 {
     max-width: calc(max(30vw, 170px));
     background-color: $main-theme-light;
     @extend %add-overflow, %padding;
+    padding-right: 0;
+  }
+  #default-projects {
+    border-bottom: 2px solid $border;
+    border-style: dashed;
   }
   .projects-list {
     display: flex;
     flex-direction: column;
     text-align-last: left;
+    padding-bottom: 15px;
     li {
+      display: flex;
+      justify-content: space-between;
       padding: 3px 10px;
+      button {
+        text-overflow: ellipsis;
+        white-space: normal;
+        overflow: hidden;
+        word-wrap: break-word;
+        background-color: transparent;
+        padding-right: 5px;
+        color: #fff;
+        font-size: calc(clamp(1.2rem, 1vw, 40px));
+      }
+      .list_dropdown-menu {
+        .dropdown-btn {
+          display: flex;
+          gap: 5px;
+          height: 100%;
+          align-items: center;
+          .btn-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 15px;
+            background-color: #fff;
+          }
+        }
+        .dropdown-content {
+          position: absolute;
+          display: none;
+          padding: 5px;
+          z-index: 100;
+          border-radius: 5px;
+          background-color: $bg-main;
+          box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
+            2px 1px 1px $border, 1px 2px 1px $border, 3px 2px 1px $border,
+            2px 3px 1px $border;
+          button {
+            font-size: calc(clamp(1rem, 1vw, 38px));
+            color: $main-color;
+          }
+          &-open{
+            display: block;
+          }
+        }
+      }
     }
-    button {
-      background-color: transparent;
-      color: #fff;
-      font-size: calc(clamp(1.2rem, 1vw, 40px));
+    #add-project-bth {
+      justify-self: bottom;
+      margin-top: auto;
     }
   }
   main {
     grid-area: main;
     @extend %add-overflow, %padding;
+  }
+}
+
+// POP-UP-FORM ///////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+#overlay.visually-hidden {
+  opacity: 0;
+}
+#overlay.hidden {
+  display: none;
+}
+
+#overlay {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: opacify($color: transparent, $amount: 0.4);
+  transition: all 0.5s;
+}
+
+#pop-up-form {
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+  margin-left: 0;
+  width: clamp(fit-content, 30vw, 600px);
+  @extend %padding;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+  background-color: $main-theme;
+  border-radius: 5%;
+  box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border,
+    1px 2px 1px $border, 3px 2px 1px $border, 2px 3px 1px $border;
+  input {
+    border-radius: 5px;
+    padding: 3px 5px;
+    margin: 10px 0;
   }
 }

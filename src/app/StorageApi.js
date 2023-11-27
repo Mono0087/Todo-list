@@ -4,29 +4,42 @@ class Storage {
     constructor(storageAPI) {
         this.storageAPI = storageAPI
     }
-    addList(list, listType) {
-        this.storageAPI.addList(list, listType)
+    saveList(list, listType) {
+        this.storageAPI.saveList(list, listType)
     }
-    getList(listName) {
-        return this.storageAPI.getList(listName)
+    getList(listKey) {
+        return this.storageAPI.getList(listKey)
     }
-    getAllLists() {
-
+    deleteList(listKey) {
+        this.storageAPI.deleteList(listKey)
     }
-    changeList() {
-
+    updateListsKeys(key, keysArray) {
+        this.storageAPI.updateListsKeys(key, keysArray)
     }
-    deleteList() {
-
+    getListsKeys(key) {
+        return this.storageAPI. getListsKeys(key)
     }
 }
 
 class localStorageApi {
-    addList(list, listType) {
+
+    saveList(list, listType) {
         localStorage.setItem(`${listType}.${list.id}`, JSON.stringify(list))
     }
-    getList(listName) {
-        let list = JSON.parse(localStorage.getItem(listName))
+    getList(listKey) {
+        let list = JSON.parse(localStorage.getItem(listKey))
         return list
     }
+    deleteList(listKey) {
+        localStorage.removeItem(listKey)
+    }
+
+    updateListsKeys(key, keysArray) {
+        localStorage.setItem(key, JSON.stringify(keysArray))
+    }
+    getListsKeys(key) {
+        let customListsKeys = JSON.parse(localStorage.getItem(key))
+        return customListsKeys ? customListsKeys : null
+    }
+
 }
