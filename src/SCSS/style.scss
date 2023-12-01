@@ -94,10 +94,10 @@ a {
   }
 }
 
-%flex-center-rules {
+%flex-column-rules {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   gap: 15px;
 }
 
@@ -110,6 +110,13 @@ a {
   overflow-x: hidden;
 }
 
+%text-overflow {
+  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
 // STYLES ////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
 
@@ -119,6 +126,7 @@ a {
   height: 100vh;
   display: grid;
   grid-template-rows: max-content auto;
+  grid-template-columns: calc(max(30vw, 170px)) auto;
   color: #fff;
   grid-template-areas:
     "header header"
@@ -127,79 +135,115 @@ a {
     grid-area: header;
     background-color: $main-theme;
     border-bottom: 2px solid $border;
-    @extend %flex-center-rules, %padding;
+    @extend %flex-column-rules, %padding;
   }
   nav {
+    position: relative;
     grid-area: nav;
-    max-width: calc(max(30vw, 170px));
     background-color: $main-theme-light;
     @extend %add-overflow, %padding;
-    padding-right: 0;
+    padding-right: 5px;
   }
   #default-projects {
     border-bottom: 2px solid $border;
     border-style: dashed;
+    font-size: calc(clamp(1.2rem, 1vw, 40px));
   }
   .projects-list {
-    display: flex;
-    flex-direction: column;
-    text-align-last: left;
+    @extend %flex-column-rules;
     padding-bottom: 15px;
-    li {
-      display: flex;
-      justify-content: space-between;
-      padding: 3px 10px;
-      button {
-        text-overflow: ellipsis;
-        white-space: normal;
-        overflow: hidden;
-        word-wrap: break-word;
-        background-color: transparent;
-        padding-right: 5px;
-        color: #fff;
-        font-size: calc(clamp(1.2rem, 1vw, 40px));
-      }
-      .list_dropdown-menu {
-        .dropdown-btn {
-          display: flex;
-          gap: 5px;
-          height: 100%;
-          align-items: center;
-          .btn-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 15px;
-            background-color: #fff;
-          }
-        }
-        .dropdown-content {
-          position: absolute;
-          display: none;
-          padding: 5px;
-          z-index: 100;
-          border-radius: 5px;
-          background-color: $bg-main;
-          box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
-            2px 1px 1px $border, 1px 2px 1px $border, 3px 2px 1px $border,
-            2px 3px 1px $border;
-          button {
-            font-size: calc(clamp(1rem, 1vw, 38px));
-            color: $main-color;
-          }
-          &-open{
-            display: block;
-          }
-        }
-      }
+    button {
+      color: #fff;
+      background-color: transparent;
+      font-size: calc(clamp(1.2rem, 1vw, 40px));
     }
-    #add-project-bth {
-      justify-self: bottom;
-      margin-top: auto;
+  }
+  #add-project-btn {
+    margin-bottom: 15px;
+  }
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    .custom-list-item_btn {
+      text-align: left;
+      @extend %text-overflow;
+    }
+    .list_dropdown-menu {
+      .dropdown-btn {
+        display: flex;
+        gap: 5px;
+        height: 100%;
+        align-items: center;
+        .btn-dot {
+          pointer-events: none;
+          width: 4px;
+          height: 4px;
+          border-radius: 15px;
+          background-color: #fff;
+        }
+      }
+      .dropdown-content {
+        position: fixed;
+        display: none;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: $bg-main;
+        box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
+          2px 1px 1px $border, 1px 2px 1px $border, 3px 2px 1px $border,
+          2px 3px 1px $border;
+        button {
+          font-size: calc(clamp(1rem, 1vw, 38px));
+          color: $main-color;
+        }
+        &-open {
+          display: block;
+        }
+      }
     }
   }
   main {
     grid-area: main;
+    padding-right: 0;
     @extend %add-overflow, %padding;
+    .list-container {
+      border-radius: 15px;
+      background-color: $main-theme;
+      @extend %padding, %flex-column-rules;
+      align-items: start;
+    }
+    .todos-container {
+      @extend %flex-column-rules;
+      gap: 10px;
+      width: 100%;
+    }
+    .todo-item {
+      display: list-item;
+      list-style: square;
+      width: 100%;
+      margin-left: 15px;
+    }
+    .todo-info-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-right: 15px;
+      gap: 10px;
+    }
+    .todo-title {
+      flex: 1 1 100%;
+      text-align: left;
+      @extend %text-overflow;
+      background-color: inherit;
+      color: #fff;
+      font-size: calc(clamp(1.2rem, 1.2vw, 38px));
+    }
+    .delete-todo-btn {
+      padding: 0 4px;
+    }
+    #add-todo-btn {
+      align-self: end;
+    }
   }
 }
 
@@ -224,16 +268,16 @@ a {
 }
 
 #pop-up-form {
+  display: flex;
+  align-items: start;
   position: fixed;
   top: 50vh;
   left: 50vw;
   transform: translate(-50%, -50%);
   margin-left: 0;
   width: clamp(fit-content, 30vw, 600px);
-  @extend %padding;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  @extend %padding, %flex-column-rules;
+  gap: 5px;
   z-index: 1;
   background-color: $main-theme;
   border-radius: 5%;
@@ -242,6 +286,16 @@ a {
   input {
     border-radius: 5px;
     padding: 3px 5px;
-    margin: 10px 0;
+    margin: 0 0 15px;
+  }
+}
+
+// MEDIA /////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+@media (max-width: 540px) {
+  .container {
+    display: flex;
+    flex-direction: column;
   }
 }

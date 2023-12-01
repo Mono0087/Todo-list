@@ -17,12 +17,14 @@ class Storage {
         this.storageAPI.updateListsKeys(key, keysArray)
     }
     getListsKeys(key) {
-        return this.storageAPI. getListsKeys(key)
+        return this.storageAPI.getListsKeys(key)
+    }
+    updateList(listKey, list) {
+        this.storageAPI.updateList(listKey, list)
     }
 }
 
 class localStorageApi {
-
     saveList(list, listType) {
         localStorage.setItem(`${listType}.${list.id}`, JSON.stringify(list))
     }
@@ -33,7 +35,6 @@ class localStorageApi {
     deleteList(listKey) {
         localStorage.removeItem(listKey)
     }
-
     updateListsKeys(key, keysArray) {
         localStorage.setItem(key, JSON.stringify(keysArray))
     }
@@ -41,5 +42,7 @@ class localStorageApi {
         let customListsKeys = JSON.parse(localStorage.getItem(key))
         return customListsKeys ? customListsKeys : null
     }
-
+    updateList(listKey, list) {
+        localStorage.setItem(listKey, JSON.stringify(list))
+    }
 }

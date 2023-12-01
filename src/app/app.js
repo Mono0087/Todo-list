@@ -1,16 +1,21 @@
-import createElement from "./utils/createElement"
-import Form from "./Form"
+import { Form, ListForm, TaskForm } from "./Form"
 import { Storage, localStorageApi } from "./StorageApi"
-import { DefaultList, CustomList } from "./List"
+import { DefaultList, CustomList, List } from "./List"
+import createElement from "./utils/createElement"
+import createListLiElement from "./utils/createListElElement"
+import { format } from 'date-fns'
 
 export const run = () => {
-    const FormApi = new Form
-
+    const FormListApi = new ListForm
+    const FormTaskApi = new TaskForm
+    // Add overlay and basic form structure to DOM
+    FormListApi.initBaseStructure()
     // CACHE DOM /////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
     const container = document.querySelector('.container')
+    const nav = container.querySelector('nav')
+    const main = container.querySelector('main')
     const addListBtn = container.querySelector('#add-project-btn')
-    FormApi.initForm() // Add form to DOM
     const defaultListsContainer = container.querySelector('[data-default-lists]')
     const customListsContainer = container.querySelector('[data-custom-lists]')
     const overlay = container.querySelector('#overlay')
@@ -23,15 +28,24 @@ export const run = () => {
     const CUSTOM_LIST_LOCAL_STORAGE_KEY = 'customList'
     const CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY = 'customListsIDs'
     let customListsKeys = StorageClient.getListsKeys(CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY) || []
+
+    // INIT //////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////
     initDefaultLists()
+    let currentList = StorageClient.getList('defaultList.1')
+    let currentListKey = 'defaultList.1'
     renderDefaultLists()
     renderCustomLists()
+    openListOnMain(currentList)
 
     // BIND EVENTS ///////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
-    customListsContainer.addEventListener('click', customListsContainerHandler)
-    addListBtn.addEventListener('click', FormApi.showForm)
+    nav.addEventListener('click', listsContainerHandler)
     overlay.addEventListener('click', handleForm)
+    addListBtn.addEventListener('click', () => {
+        FormListApi.initForm()
+        FormListApi.showForm()
+    })
 
 
     // FUNCTIONS /////////////////////////////////////////////////////////
@@ -41,6 +55,10 @@ export const run = () => {
             new DefaultList(1, 'Today'),
             new DefaultList(2, 'Week'),
             new DefaultList(3, 'Everyday')
+        ]
+        defaultLists[0].todos = [
+            { title: 'Wake up', dueDate: format(new Date(), 'dd/MM/yyyy'), checked: true, priority: 0 },
+            { title: 'drink water', dueDate: format(new Date(), 'dd/MM/yyyy'), checked: false, priority: 0 }
         ]
         defaultLists.forEach((list, i) => {
             let inStorage = StorageClient.getList(`${DEFAULT_LIST_LOCAL_STORAGE_KEY}.${i + 1}`)
@@ -70,40 +88,51 @@ export const run = () => {
         })
     }
 
-    function createListLiElement(listObj, listType) {
-        let listEl = createElement('li', [`${listType}-list-item`], null, null, `${listType}ListId`, listObj.id)
-        let listElBtn = createElement('button', [`${listType}-list-item_btn`], null, listObj.name)
-        listEl.appendChild(listElBtn)
-        if (listType === 'custom') {
-            let dropDownMenu = createElement('div', ['list_dropdown-menu'], null, null)
-            let dropDownMenuBtn = createElement('button', ['dropdown-btn'], null)
-            let btnDot = createElement('div', ['btn-dot'])
-            dropDownMenuBtn.innerHTML = btnDot.outerHTML + btnDot.outerHTML + btnDot.outerHTML
-            let dropDownMenuContent = createElement('menu', ['dropdown-content'])
-            let deleteListBtn = createElement('button', ['delete-list-btn'], null, 'Delete project')
-            dropDownMenuContent.append(deleteListBtn)
-            dropDownMenu.append(dropDownMenuBtn, dropDownMenuContent)
-            listEl.appendChild(dropDownMenu)
+    function handleForm(Event) {
+        switch (Event.target.id) {
+            case 'overlay':
+                FormListApi.hideForm()
+                break;
+            case 'save-list-btn':
+                saveList()
+                Event.preventDefault()
+                break;
+            case 'save-task-btn':
+                saveTask()
+                Event.preventDefault()
+                break;
+            default:
+                break;
         }
-        return listEl
+
+        Event.stopPropagation()
     }
 
-    function handleForm(Event) {
-        if (Event.target.id === 'overlay') FormApi.hideForm()
-        if (Event.target.id === 'add-list-btn') {
-            let inputsData = getInputsData()
-            let isValid = FormApi.validateFormInputs(inputsData)
-            if (!isValid) {
-                alert('All fields must be filled up!')
-                Event.preventDefault();
-                return;
-            }
-            createList(inputsData[0])
-            renderCustomLists()
-            FormApi.hideForm()
-            Event.preventDefault()
+    function saveList() {
+        let inputsData = getInputsData()
+        let isValid = FormListApi.validateFormInputs(inputsData)
+        if (!isValid) {
+            alert('All fields must be filled up!')
+            return;
         }
-        Event.stopPropagation()
+        FormListApi.hideForm()
+        createList(inputsData[0])
+        renderCustomLists()
+    }
+
+    function saveTask() {
+        let inputsData = getInputsData()
+        let isValid = FormTaskApi.validateFormInputs(inputsData)
+        if (!isValid) {
+            alert('All fields must be filled up!')
+            return;
+        }
+        let date = new Date(inputsData[1])
+        let formatDate = format(date, 'dd/MM/yyyy')
+        inputsData[1] = formatDate
+        FormTaskApi.hideForm()
+        createTask(inputsData)
+        renderTodos(currentList)
     }
 
     function createList(listName) {
@@ -112,6 +141,12 @@ export const run = () => {
         customListsKeys.push(listKey)
         StorageClient.updateListsKeys(CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY, customListsKeys)
         StorageClient.saveList(list, CUSTOM_LIST_LOCAL_STORAGE_KEY)
+    }
+
+    function createTask(inputs) {
+        let task = { title: inputs[0], dueDate: inputs[1], priority: inputs[2], checked: false }
+        currentList.todos.push(task)
+        StorageClient.updateList(currentListKey, currentList)
     }
 
     function deleteList(listKey) {
@@ -131,17 +166,43 @@ export const run = () => {
         return inputsData
     }
 
-    function customListsContainerHandler(Event) {
+    function listsContainerHandler(Event) {
         let target = Event.target
-        if (target.classList.contains('custom-list-item_btn')) {
-            // Show list on main
-        } else if (target.classList.contains('dropdown-btn')) {
-            openDropDownMenu(target)
+        let targetData = Event.target.dataset.navEl
+        switch (targetData) {
+            case 'list-item-btn':
+                let listId = target.parentElement.dataset.listId
+                currentList = StorageClient.getList(listId)
+                currentListKey = listId
+                openListOnMain(currentList)
+                break;
+            case 'dropdown-btn':
+                openDropDownMenu(target)
+                break;
+            case 'delete-list-btn':
+                let listElId = target.closest('.custom-list-item').dataset.listId
+                deleteList(listElId)
+                break;
+            default:
+                break;
+        }
+    }
 
-        } else if (target.classList.contains('delete-list-btn')) {
-            let listElId = target.parentElement.parentElement.parentElement.dataset.customListId
-            deleteList(`customList.${listElId}`)
-
+    function todosContainerClickHandler(Event) {
+        let container = Event.target.closest('.todos-container')
+        let targetData = `${Event.target.dataset.todoEl}`
+        let todoEl = Event.target.closest('.todo-item')
+        let index = Array.from(container.children).indexOf(todoEl);
+        switch (targetData) {
+            case 'title':
+                '_returnLater'
+                console.log()
+                break;
+            case 'delete':
+                deleteTodo(index)
+                break;
+            default:
+                break;
         }
     }
 
@@ -160,4 +221,40 @@ export const run = () => {
         })
     }
 
+    function openListOnMain(list) {
+        main.innerHTML = ''
+        let listContainer = createElement('div', ['list-container'], null, null)
+        let h2 = createElement('h2', null, 'list-title', list.name)
+        let todosContainer = createElement('ul', ['todos-container'])
+        let addTodoBtn = createElement('button', ['btn'], 'add-todo-btn', 'Add task')
+        addTodoBtn.addEventListener('click', () => {
+            FormTaskApi.initForm()
+            FormTaskApi.showForm()
+        })
+        listContainer.append(h2, todosContainer, addTodoBtn)
+        main.appendChild(listContainer)
+        todosContainer.addEventListener('click',
+            todosContainerClickHandler)
+        renderTodos(list)
+    }
+
+    function renderTodos(list) {
+        let todosContainer = container.querySelector('.todos-container')
+        todosContainer.innerHTML = ''
+        list.todos.forEach(todo => {
+            let todoEl = createElement('li', ['todo-item'])
+            let todoElInfoContainer = createElement('div', ['todo-info-container'])
+            let todoTitle = createElement('button', ['todo-title'], null, todo.title, 'todoEl', 'title')
+            let todoDueDate = createElement('span', ['todo-date'], null, todo.dueDate)
+            let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
+            todoElInfoContainer.append(todoTitle, todoDueDate, deleteTodoBtn)
+            todoEl.appendChild(todoElInfoContainer)
+            todosContainer.appendChild(todoEl)
+        })
+    }
+    function deleteTodo(todoId) {
+        currentList.todos.splice(todoId, 1)
+        renderTodos(currentList)
+        StorageClient.updateList(currentListKey, currentList)
+    }
 }
