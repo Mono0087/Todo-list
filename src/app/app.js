@@ -1,4 +1,4 @@
-import { Form, ListForm, TaskForm } from "./Form"
+import { Form, ListForm, TaskForm, ChangeTaskForm } from "./Form"
 import { Storage, localStorageApi } from "./StorageApi"
 import { DefaultList, CustomList, List } from "./List"
 import createElement from "./utils/createElement"
@@ -8,6 +8,7 @@ import { format } from 'date-fns'
 export const run = () => {
     const FormListApi = new ListForm
     const FormTaskApi = new TaskForm
+    const FormChangeTaskApi = new ChangeTaskForm
     // Add overlay and basic form structure to DOM
     FormListApi.initBaseStructure()
     // CACHE DOM /////////////////////////////////////////////////////////
@@ -95,13 +96,13 @@ export const run = () => {
                 break;
             case 'save-list-btn':
                 saveList()
+                FormTaskApi.hideForm()
                 Event.preventDefault()
                 break;
             case 'save-task-btn':
                 saveTask()
+                FormTaskApi.hideForm()
                 Event.preventDefault()
-                break;
-            default:
                 break;
         }
 
@@ -115,24 +116,8 @@ export const run = () => {
             alert('All fields must be filled up!')
             return;
         }
-        FormListApi.hideForm()
         createList(inputsData[0])
         renderCustomLists()
-    }
-
-    function saveTask() {
-        let inputsData = getInputsData()
-        let isValid = FormTaskApi.validateFormInputs(inputsData)
-        if (!isValid) {
-            alert('All fields must be filled up!')
-            return;
-        }
-        let date = new Date(inputsData[1])
-        let formatDate = format(date, 'dd/MM/yyyy')
-        inputsData[1] = formatDate
-        FormTaskApi.hideForm()
-        createTask(inputsData)
-        renderTodos(currentList)
     }
 
     function createList(listName) {
@@ -143,10 +128,20 @@ export const run = () => {
         StorageClient.saveList(list, CUSTOM_LIST_LOCAL_STORAGE_KEY)
     }
 
-    function createTask(inputs) {
+    function saveTask() {
+        let inputs = handleInputsData()
         let task = { title: inputs[0], dueDate: inputs[1], priority: inputs[2], checked: false }
         currentList.todos.push(task)
         StorageClient.updateList(currentListKey, currentList)
+        renderTodos(currentList)
+    }
+
+    function changeTask(taskId) {
+        let inputs = handleInputsData()
+        let changedTask = { title: inputs[0], dueDate: inputs[1], priority: inputs[2], checked: false }
+        currentList.todos[taskId] = changedTask
+        StorageClient.updateList(currentListKey, currentList)
+        renderTodos(currentList)
     }
 
     function deleteList(listKey) {
@@ -156,6 +151,19 @@ export const run = () => {
         })
         StorageClient.updateListsKeys(CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY, customListsKeys)
         renderCustomLists()
+    }
+
+    function handleInputsData() {
+        let inputsData = getInputsData()
+        let isValid = FormTaskApi.validateFormInputs(inputsData)
+        if (!isValid) {
+            alert('All fields must be filled up!')
+            return;
+        }
+        let date = new Date(inputsData[1])
+        let formatDate = format(date, 'dd/MM/yyyy')
+        inputsData[1] = formatDate
+        return inputsData
     }
 
     function getInputsData() {
@@ -189,10 +197,10 @@ export const run = () => {
     }
 
     function todosContainerClickHandler(Event) {
-        let container = Event.target.closest('.todos-container')
+        let todosContainer = Event.target.closest('.todos-container')
         let targetData = `${Event.target.dataset.todoEl}`
         let todoEl = Event.target.closest('.todo-item')
-        let index = Array.from(container.children).indexOf(todoEl);
+        let index = Array.from(todosContainer.children).indexOf(todoEl);
         switch (targetData) {
             case 'title':
                 Event.target.classList.toggle('checked')
@@ -200,6 +208,16 @@ export const run = () => {
                 break;
             case 'delete':
                 deleteTodo(index)
+                break;
+            case 'change':
+                FormChangeTaskApi.initForm()
+                FormChangeTaskApi.showForm()
+                let changeTaskBtn = container.querySelector('#change-task-btn')
+                changeTaskBtn.addEventListener('click', (e) => {
+                    changeTask(index)
+                    FormTaskApi.hideForm()
+                    e.preventDefault()
+                })
                 break;
             default:
                 break;
@@ -248,7 +266,8 @@ export const run = () => {
             todo.checked ? todoTitle.classList.add('checked') : null
             let todoDueDate = createElement('span', ['todo-date'], null, todo.dueDate)
             let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
-            todoElInfoContainer.append(todoTitle, todoDueDate, deleteTodoBtn)
+            let changeTodoBtn = createElement('button', ['btn', 'change-todo-btn'], null, '✎', 'todoEl', 'change')
+            todoElInfoContainer.append(todoTitle, todoDueDate, deleteTodoBtn, changeTodoBtn)
             todoEl.appendChild(todoElInfoContainer)
             todosContainer.appendChild(todoEl)
         })

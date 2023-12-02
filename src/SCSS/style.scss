@@ -225,7 +225,7 @@ a {
     }
     .todo-info-container {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       justify-content: space-between;
       padding-right: 15px;
       gap: 10px;
@@ -241,7 +241,8 @@ a {
     .checked{
         text-decoration: 2px line-through $border;
     }
-    .delete-todo-btn {
+    .delete-todo-btn, .change-todo-btn {
+      color: #000;
       padding: 0 4px;
     }
     #add-todo-btn {
