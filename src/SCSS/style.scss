@@ -238,6 +238,9 @@ a {
       color: #fff;
       font-size: calc(clamp(1.2rem, 1.2vw, 38px));
     }
+    .checked{
+        text-decoration: 2px line-through $border;
+    }
     .delete-todo-btn {
       padding: 0 4px;
     }

@@ -195,8 +195,8 @@ export const run = () => {
         let index = Array.from(container.children).indexOf(todoEl);
         switch (targetData) {
             case 'title':
-                '_returnLater'
-                console.log()
+                Event.target.classList.toggle('checked')
+                toggleCrossOutTask(index)
                 break;
             case 'delete':
                 deleteTodo(index)
@@ -245,6 +245,7 @@ export const run = () => {
             let todoEl = createElement('li', ['todo-item'])
             let todoElInfoContainer = createElement('div', ['todo-info-container'])
             let todoTitle = createElement('button', ['todo-title'], null, todo.title, 'todoEl', 'title')
+            todo.checked ? todoTitle.classList.add('checked') : null
             let todoDueDate = createElement('span', ['todo-date'], null, todo.dueDate)
             let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
             todoElInfoContainer.append(todoTitle, todoDueDate, deleteTodoBtn)
@@ -257,4 +258,11 @@ export const run = () => {
         renderTodos(currentList)
         StorageClient.updateList(currentListKey, currentList)
     }
+
+    function toggleCrossOutTask(taskId) {
+        let todo = currentList.todos[taskId]
+        todo.checked = todo.checked ? false : true
+        StorageClient.updateList(currentListKey, currentList)
+    }
+
 }
