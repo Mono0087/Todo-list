@@ -96,11 +96,13 @@ export const run = () => {
                 break;
             case 'save-list-btn':
                 saveList()
+                renderCustomLists()
                 FormTaskApi.hideForm()
                 Event.preventDefault()
                 break;
             case 'save-task-btn':
                 saveTask()
+                renderTodos(currentList)
                 FormTaskApi.hideForm()
                 Event.preventDefault()
                 break;
@@ -117,7 +119,6 @@ export const run = () => {
             return;
         }
         createList(inputsData[0])
-        renderCustomLists()
     }
 
     function createList(listName) {
@@ -133,7 +134,6 @@ export const run = () => {
         let task = { title: inputs[0], dueDate: inputs[1], priority: inputs[2], checked: false }
         currentList.todos.push(task)
         StorageClient.updateList(currentListKey, currentList)
-        renderTodos(currentList)
     }
 
     function changeTask(taskId) {
@@ -141,7 +141,6 @@ export const run = () => {
         let changedTask = { title: inputs[0], dueDate: inputs[1], priority: inputs[2], checked: false }
         currentList.todos[taskId] = changedTask
         StorageClient.updateList(currentListKey, currentList)
-        renderTodos(currentList)
     }
 
     function deleteList(listKey) {
@@ -150,7 +149,6 @@ export const run = () => {
             if (key == listKey) customListsKeys.splice(i, 1)
         })
         StorageClient.updateListsKeys(CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY, customListsKeys)
-        renderCustomLists()
     }
 
     function handleInputsData() {
@@ -190,6 +188,7 @@ export const run = () => {
             case 'delete-list-btn':
                 let listElId = target.closest('.custom-list-item').dataset.listId
                 deleteList(listElId)
+                renderCustomLists()
                 break;
             default:
                 break;
@@ -208,6 +207,7 @@ export const run = () => {
                 break;
             case 'delete':
                 deleteTodo(index)
+                renderTodos(currentList)
                 break;
             case 'change':
                 FormChangeTaskApi.initForm()
@@ -215,6 +215,7 @@ export const run = () => {
                 let changeTaskBtn = container.querySelector('#change-task-btn')
                 changeTaskBtn.addEventListener('click', (e) => {
                     changeTask(index)
+                    renderTodos(currentList)
                     FormTaskApi.hideForm()
                     e.preventDefault()
                 })
@@ -261,20 +262,21 @@ export const run = () => {
         todosContainer.innerHTML = ''
         list.todos.forEach(todo => {
             let todoEl = createElement('li', ['todo-item'])
-            let todoElInfoContainer = createElement('div', ['todo-info-container'])
+            let todoElContainer = createElement('div', ['todo-container'])
             let todoTitle = createElement('button', ['todo-title'], null, todo.title, 'todoEl', 'title')
             todo.checked ? todoTitle.classList.add('checked') : null
             let todoDueDate = createElement('span', ['todo-date'], null, todo.dueDate)
             let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
             let changeTodoBtn = createElement('button', ['btn', 'change-todo-btn'], null, '✎', 'todoEl', 'change')
-            todoElInfoContainer.append(todoTitle, todoDueDate, deleteTodoBtn, changeTodoBtn)
-            todoEl.appendChild(todoElInfoContainer)
+            let todoInfoContainer = createElement('div', ['todo-info-container'])
+            todoInfoContainer.append(todoDueDate, deleteTodoBtn, changeTodoBtn)
+            todoElContainer.append(todoTitle, todoInfoContainer)
+            todoEl.appendChild(todoElContainer)
             todosContainer.appendChild(todoEl)
         })
     }
     function deleteTodo(todoId) {
         currentList.todos.splice(todoId, 1)
-        renderTodos(currentList)
         StorageClient.updateList(currentListKey, currentList)
     }
 
