@@ -91,6 +91,6 @@ function createTaskInputs() {
     const priorityInput = createElement('input', null, 'new-priority')
     priorityInput.type = "number"
     priorityInput.min = '0'
-    priorityInput.max = '5'
+    priorityInput.max = '4'
     return [nameLabel, nameInput, dueDateLabel, dueDateInput, priorityLabel, priorityInput]
 }

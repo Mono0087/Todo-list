@@ -242,6 +242,7 @@ a {
       flex: 0 0 30%;
       margin-left: auto;
       justify-content: end;
+      align-items: center;
     }
     .todo-title {
       flex: 1 1 60%;
@@ -258,13 +259,22 @@ a {
     .change-todo-btn,
     .priority-icon {
       color: #000;
+      background-color: $bg-main;
       padding: 0 4px;
+    }
+    .priority-icon {
+      cursor: default;
+      color: transparent;
+      border-radius: 3px;
+      box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border,
+        1px 2px 1px $border, 3px 2px 1px $border, 2px 3px 1px $border;
+      &:hover {
+        opacity: initial;
+        color: transparent;
+      }
     }
     #add-todo-btn {
       align-self: end;
-    }
-    .priority-icon{
-
     }
   }
 }
@@ -319,10 +329,9 @@ a {
   .container {
     display: block;
   }
-  nav .projects-list .custom-list-item{
+  nav .projects-list .custom-list-item {
     flex-direction: row-reverse;
     justify-content: start;
     gap: 10px;
-    
   }
 }

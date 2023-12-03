@@ -268,8 +268,11 @@ export const run = () => {
             let todoDueDate = createElement('span', ['todo-date'], null, todo.dueDate)
             let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
             let changeTodoBtn = createElement('button', ['btn', 'change-todo-btn'], null, '✎', 'todoEl', 'change')
+            let priorityIcon = createElement('button', ['priority-icon'], null, '✗')
+            const priorities = ['white', '#32c246', '#d6d436', '#d69136', '#d65036']
+            priorityIcon.style.backgroundColor = `${priorities[todo.priority]}`
             let todoInfoContainer = createElement('div', ['todo-info-container'])
-            todoInfoContainer.append(todoDueDate, deleteTodoBtn, changeTodoBtn)
+            todoInfoContainer.append(todoDueDate, deleteTodoBtn, changeTodoBtn, priorityIcon)
             todoElContainer.append(todoTitle, todoInfoContainer)
             todoEl.appendChild(todoElContainer)
             todosContainer.appendChild(todoEl)
