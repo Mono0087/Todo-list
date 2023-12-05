@@ -130,7 +130,12 @@ export const run = () => {
     }
 
     function saveTask() {
-        let inputs = handleInputsData()
+        let inputs = getInputsData()
+        let isValid = FormTaskApi.validateFormInputs(inputs)
+        if (!isValid) {
+            alert('Allsdfasdfasdf')
+            return;
+        }
         let task = { title: inputs[0], dueDate: inputs[1], priority: inputs[2], checked: false }
         currentList.todos.push(task)
         StorageClient.updateList(currentListKey, currentList)
