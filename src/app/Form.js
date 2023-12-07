@@ -1,5 +1,5 @@
 import createElement from "./utils/createElement"
-export { Form, ListForm, TaskForm, ChangeTaskForm }
+export { Form, ListForm, TaskForm, EverydayTaskForm, ChangeEverydayTaskForm, ChangeTaskForm, SetStartOfDay}
 
 class Form {
     initBaseStructure() {
@@ -64,8 +64,38 @@ class TaskForm extends Form {
     }
 }
 
+class EverydayTaskForm extends Form {
+    initForm() {
+        const form = document.querySelector('#pop-up-form')
+        form.innerHTML = ''
+        const h2 = createElement('h2', null, null, 'Add Task')
+        const nameLabel = createElement('label', null, null, 'Task:')
+        nameLabel.htmlFor = "new-title"
+        const nameInput = createElement('input', null, 'new-title')
+        nameInput.type = "text"
+        const saveTaskBtn = createElement('button', ['btn'], 'save-task-btn', 'Add task')
+        saveTaskBtn.type = "submit"
+        form.append(h2, nameLabel, nameInput, saveTaskBtn)
+    }
+}
+
+class ChangeEverydayTaskForm extends Form {
+    initForm() {
+        const form = document.querySelector('#pop-up-form')
+        form.innerHTML = ''
+        const h2 = createElement('h2', null, null, 'Change Task')
+        const nameLabel = createElement('label', null, null, 'Task:')
+        nameLabel.htmlFor = "new-title"
+        const nameInput = createElement('input', null, 'new-title')
+        nameInput.type = "text"
+        const saveTaskBtn = createElement('button', ['btn'], 'change-task-btn', 'Change task')
+        saveTaskBtn.type = "submit"
+        form.append(h2, nameLabel, nameInput, saveTaskBtn)
+    }
+}
+
 class ChangeTaskForm extends Form {
-    initForm(){
+    initForm() {
         const form = document.querySelector('#pop-up-form')
         form.innerHTML = ''
         const h2 = createElement('h2', null, null, 'Change Task')
@@ -93,4 +123,18 @@ function createTaskInputs() {
     priorityInput.min = '0'
     priorityInput.max = '4'
     return [nameLabel, nameInput, dueDateLabel, dueDateInput, priorityLabel, priorityInput]
+}
+
+class SetStartOfDay extends Form {
+    initForm() {
+        const form = document.querySelector('#pop-up-form')
+        form.innerHTML = ''
+        const h2 = createElement('h2', null, null, 'Set start hour:')
+        const startHourInput = createElement('input', null, 'new-title')
+        startHourInput.type = "number"
+        startHourInput.min = '0'
+        startHourInput.max = '24'
+        const saveTimeBtn = createElement('button', ['btn'], 'change-time-btn', 'Save time')
+        form.append(h2, startHourInput, saveTimeBtn)
+    }
 }

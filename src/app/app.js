@@ -1,14 +1,18 @@
-import { Form, ListForm, TaskForm, ChangeTaskForm } from "./Form"
+import { Form, ListForm, TaskForm, EverydayTaskForm, ChangeEverydayTaskForm, ChangeTaskForm, SetStartOfDay } from "./Form"
 import { Storage, localStorageApi } from "./StorageApi"
-import { DefaultList, CustomList, List } from "./List"
+import { DefaultList, DefaultEverydayList, CustomList, List } from "./List"
 import createElement from "./utils/createElement"
 import createListLiElement from "./utils/createListElElement"
-import { format } from 'date-fns'
+import { format, setHours, getHours, startOfToday, differenceInHours } from 'date-fns'
 
 export const run = () => {
     const FormListApi = new ListForm
     const FormTaskApi = new TaskForm
+    const FormEverydayTaskApi = new EverydayTaskForm
     const FormChangeTaskApi = new ChangeTaskForm
+    const FormChangeEverydayTaskApi = new ChangeEverydayTaskForm
+    const FormSetStartOfDayApi = new SetStartOfDay
+
     // Add overlay and basic form structure to DOM
     FormListApi.initBaseStructure()
     // CACHE DOM /////////////////////////////////////////////////////////
@@ -26,18 +30,22 @@ export const run = () => {
     //////////////////////////////////////////////////////////////////////
     let StorageClient = new Storage(new localStorageApi)
     const DEFAULT_LIST_LOCAL_STORAGE_KEY = 'defaultList'
+    const DEFAULT_EVERYDAY_LIST_STORAGE_KEY = 'defaultEverydayList'
     const CUSTOM_LIST_LOCAL_STORAGE_KEY = 'customList'
     const CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY = 'customListsIDs'
     let customListsKeys = StorageClient.getListsKeys(CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY) || []
+    let defaultLists = []
 
     // INIT //////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
     initDefaultLists()
-    let currentList = StorageClient.getList('defaultList.1')
     let currentListKey = 'defaultList.1'
+    let currentList = StorageClient.getList(currentListKey)
     renderDefaultLists()
     renderCustomLists()
     openListOnMain(currentList)
+    let startHour = '0'
+    initStartTime()
 
     // BIND EVENTS ///////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
@@ -52,21 +60,26 @@ export const run = () => {
     // FUNCTIONS /////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
     function initDefaultLists() {
-        let defaultLists = [
+        defaultLists = [
             new DefaultList(1, 'Today'),
             new DefaultList(2, 'Week'),
-            new DefaultList(3, 'Everyday')
         ]
+        let everydayDefaultList = new DefaultEverydayList(3, 'Everyday')
         defaultLists[0].todos = [
             { title: 'Wake up', dueDate: format(new Date(), 'dd/MM/yyyy'), checked: true, priority: 0 },
             { title: 'drink water', dueDate: format(new Date(), 'dd/MM/yyyy'), checked: false, priority: 0 }
         ]
-        defaultLists.forEach((list, i) => {
-            let inStorage = StorageClient.getList(`${DEFAULT_LIST_LOCAL_STORAGE_KEY}.${i + 1}`)
-            if (!inStorage) {
-                StorageClient.saveList(list, DEFAULT_LIST_LOCAL_STORAGE_KEY)
-            }
+        defaultLists.forEach((list) => {
+            addDefaultListToStorage(DEFAULT_LIST_LOCAL_STORAGE_KEY, list)
         })
+        addDefaultListToStorage(DEFAULT_EVERYDAY_LIST_STORAGE_KEY, everydayDefaultList)
+    }
+
+    function addDefaultListToStorage(listKeyPrefix, list) {
+        let inStorage = StorageClient.getList(`${listKeyPrefix}.${list.id}`)
+        if (!inStorage) {
+            StorageClient.saveList(list, listKeyPrefix)
+        }
     }
 
     function renderDefaultLists() {
@@ -78,6 +91,9 @@ export const run = () => {
             defaultListsContainer.appendChild(listEl)
             ++i
         }
+        let everydayDefaultList = StorageClient.getList(`${DEFAULT_EVERYDAY_LIST_STORAGE_KEY}.3`)
+        let listEl = createListLiElement(everydayDefaultList, 'defaultEveryday')
+        defaultListsContainer.appendChild(listEl)
     }
 
     function renderCustomLists() {
@@ -87,6 +103,27 @@ export const run = () => {
             let listEl = createListLiElement(list, 'custom')
             customListsContainer.append(listEl)
         })
+    }
+
+    function initStartTime() {
+        let storageHasStartHour = StorageClient.getStartTime()
+        if (storageHasStartHour === null) {
+            setStartTime(startHour)
+        } else {
+            let startTime = new Date(StorageClient.getStartTime())
+            let currentTime = new Date()
+            startHour = getHours(startTime)
+            if (+differenceInHours(startTime, currentTime) > 24) {
+                setStartTime(startHour)
+                updateEverydayTasks()
+            }
+        }
+    }
+
+    function setStartTime(h) {
+        let date = startOfToday()
+        let newDate = setHours(date, h)
+        StorageClient.setStartTime(newDate)
     }
 
     function handleForm(Event) {
@@ -106,8 +143,13 @@ export const run = () => {
                 FormTaskApi.hideForm()
                 Event.preventDefault()
                 break;
+            case 'change-time-btn':
+                changeStartOfDay()
+                openEverydayListOnMain(currentList)
+                FormTaskApi.hideForm()
+                Event.preventDefault()
+                break;
         }
-
         Event.stopPropagation()
     }
 
@@ -148,12 +190,25 @@ export const run = () => {
         StorageClient.updateList(currentListKey, currentList)
     }
 
+    function changeEverydayTask(taskId) {
+        let input = popUpForm.querySelector('input')
+        let changedTask = { title: input.value, checked: false }
+        currentList.todos[taskId] = changedTask
+        StorageClient.updateList(currentListKey, currentList)
+    }
+
     function deleteList(listKey) {
         StorageClient.deleteList(listKey)
         customListsKeys.forEach((key, i) => {
             if (key == listKey) customListsKeys.splice(i, 1)
         })
         StorageClient.updateListsKeys(CUSTOM_LISTS_KEYS_LOCAL_STORAGE_KEY, customListsKeys)
+    }
+
+    function changeStartOfDay() {
+        let input = popUpForm.querySelector('input')
+        let hour = input.value
+        setStartTime(hour)
     }
 
     function handleInputsData() {
@@ -185,7 +240,11 @@ export const run = () => {
                 let listId = target.parentElement.dataset.listId
                 currentList = StorageClient.getList(listId)
                 currentListKey = listId
-                openListOnMain(currentList)
+                if (listId === 'defaultEverydayList.3') {
+                    openEverydayListOnMain(currentList)
+                } else {
+                    openListOnMain(currentList)
+                }
                 break;
             case 'dropdown-btn':
                 openDropDownMenu(target)
@@ -215,6 +274,18 @@ export const run = () => {
                 renderTodos(currentList)
                 break;
             case 'change':
+                if (currentListKey === 'defaultEverydayList.3') {
+                    FormChangeEverydayTaskApi.initForm()
+                    FormChangeEverydayTaskApi.showForm()
+                    let changeTaskBtn = container.querySelector('#change-task-btn')
+                    changeTaskBtn.addEventListener('click', (e) => {
+                        changeEverydayTask(index)
+                        renderTodos(currentList)
+                        FormEverydayTaskApi.hideForm()
+                        e.preventDefault()
+                    })
+                    break;
+                }
                 FormChangeTaskApi.initForm()
                 FormChangeTaskApi.showForm()
                 let changeTaskBtn = container.querySelector('#change-task-btn')
@@ -247,42 +318,89 @@ export const run = () => {
 
     function openListOnMain(list) {
         main.innerHTML = ''
-        let listContainer = createElement('div', ['list-container'], null, null)
-        let h2 = createElement('h2', null, 'list-title', list.name)
-        let todosContainer = createElement('ul', ['todos-container'])
-        let addTodoBtn = createElement('button', ['btn'], 'add-todo-btn', 'Add task')
+        let listContainer = baseListStructure(list)
+        let addTodoBtn = listContainer.querySelector('#add-todo-btn')
         addTodoBtn.addEventListener('click', () => {
             FormTaskApi.initForm()
             FormTaskApi.showForm()
         })
-        listContainer.append(h2, todosContainer, addTodoBtn)
         main.appendChild(listContainer)
-        todosContainer.addEventListener('click',
-            todosContainerClickHandler)
-        renderTodos(list)
+        renderTodos(currentList)
+    }
+
+    function openEverydayListOnMain(list) {
+        main.innerHTML = ''
+        let listContainer = baseListStructure(list)
+        let dayStartBtn = createElement('btn', ['btn'], 'start-time-btn', 'Set start of the day')
+        dayStartBtn.addEventListener('click', () => {
+            FormSetStartOfDayApi.initForm()
+            FormSetStartOfDayApi.showForm()
+        })
+        let date = StorageClient.getStartTime()
+        date = format(new Date(date), 'dd/MM/yyyy HH:mm')
+        let startOfDayInfo = createElement('p', null, 'start-of-day-info', `Tasks for today - ${date}:`)
+        listContainer.children[0].insertAdjacentElement('afterEnd', dayStartBtn)
+        listContainer.children[1].insertAdjacentElement('afterEnd', startOfDayInfo)
+        let addTodoBtn = listContainer.querySelector('#add-todo-btn')
+        addTodoBtn.addEventListener('click', () => {
+            FormEverydayTaskApi.initForm()
+            FormEverydayTaskApi.showForm()
+        })
+        main.appendChild(listContainer)
+        renderEverydayTodos(currentList)
+    }
+
+    function baseListStructure(list) {
+        let listContainer = createElement('div', ['list-container'], null, null)
+        let h2 = createElement('h2', null, 'list-title', list.name)
+        let todosContainer = createElement('ul', ['todos-container'])
+        let addTodoBtn = createElement('button', ['btn'], 'add-todo-btn', 'Add task')
+        listContainer.append(h2, todosContainer, addTodoBtn)
+        todosContainer.addEventListener('click', todosContainerClickHandler)
+        return listContainer
     }
 
     function renderTodos(list) {
         let todosContainer = container.querySelector('.todos-container')
         todosContainer.innerHTML = ''
         list.todos.forEach(todo => {
-            let todoEl = createElement('li', ['todo-item'])
-            let todoElContainer = createElement('div', ['todo-container'])
-            let todoTitle = createElement('button', ['todo-title'], null, todo.title, 'todoEl', 'title')
-            todo.checked ? todoTitle.classList.add('checked') : null
+            let todoEl = baseTodoStructure(todo)
+            let todoInfoContainer = todoEl.querySelector('.todo-info-container')
+            let todoElContainer = todoEl.querySelector('.todo-container')
             let todoDueDate = createElement('span', ['todo-date'], null, todo.dueDate)
-            let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
-            let changeTodoBtn = createElement('button', ['btn', 'change-todo-btn'], null, '✎', 'todoEl', 'change')
             let priorityIcon = createElement('button', ['priority-icon'], null, '✗')
             const priorities = ['white', '#32c246', '#d6d436', '#d69136', '#d65036']
             priorityIcon.style.backgroundColor = `${priorities[todo.priority]}`
-            let todoInfoContainer = createElement('div', ['todo-info-container'])
-            todoInfoContainer.append(todoDueDate, deleteTodoBtn, changeTodoBtn, priorityIcon)
-            todoElContainer.append(todoTitle, todoInfoContainer)
+            todoInfoContainer.prepend(todoDueDate)
+            todoInfoContainer.append(priorityIcon)
             todoEl.appendChild(todoElContainer)
             todosContainer.appendChild(todoEl)
         })
     }
+
+    function renderEverydayTodos(list) {
+        let todosContainer = container.querySelector('.todos-container')
+        todosContainer.innerHTML = ''
+        list.todos.forEach(todo => {
+            let todoEl = baseTodoStructure(todo)
+            todosContainer.appendChild(todoEl)
+        })
+    }
+
+    function baseTodoStructure(todo) {
+        let todoEl = createElement('li', ['todo-item'])
+        let todoElContainer = createElement('div', ['todo-container'])
+        let todoTitle = createElement('button', ['todo-title'], null, todo.title, 'todoEl', 'title')
+        todo.checked ? todoTitle.classList.add('checked') : null
+        let deleteTodoBtn = createElement('button', ['btn', 'delete-todo-btn'], null, '✗', 'todoEl', 'delete')
+        let changeTodoBtn = createElement('button', ['btn', 'change-todo-btn'], null, '✎', 'todoEl', 'change')
+        let todoInfoContainer = createElement('div', ['todo-info-container'])
+        todoInfoContainer.append(deleteTodoBtn, changeTodoBtn)
+        todoElContainer.append(todoTitle, todoInfoContainer)
+        todoEl.appendChild(todoElContainer)
+        return todoEl
+    }
+
     function deleteTodo(todoId) {
         currentList.todos.splice(todoId, 1)
         StorageClient.updateList(currentListKey, currentList)
@@ -294,4 +412,11 @@ export const run = () => {
         StorageClient.updateList(currentListKey, currentList)
     }
 
+    function updateEverydayTasks() {
+        let everydayList = StorageClient.getList(`${DEFAULT_EVERYDAY_LIST_STORAGE_KEY}.3`)
+        everydayList.todos.forEach((todo, i) => {
+            if (todo.checked) todo.checked = false
+        })
+        StorageClient.updateList(`${DEFAULT_EVERYDAY_LIST_STORAGE_KEY}.3`, everydayList)
+    }
 }

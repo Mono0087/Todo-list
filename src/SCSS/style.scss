@@ -239,7 +239,7 @@ a {
       flex-wrap: wrap;
     }
     .todo-info-container {
-      flex: 0 0 30%;
+      flex: 0 0 calc(max(30%, max-content));
       margin-left: auto;
       justify-content: end;
       align-items: center;
@@ -275,6 +275,11 @@ a {
     }
     #add-todo-btn {
       align-self: end;
+    }
+    #start-time-btn{
+      background-color: $bg-main;
+      color: $main-color;
+      margin: 0;
     }
   }
 }

@@ -22,6 +22,12 @@ class Storage {
     updateList(listKey, list) {
         this.storageAPI.updateList(listKey, list)
     }
+    getStartTime() {
+        return this.storageAPI.getStartTime()
+    }
+    setStartTime(date) {
+        this.storageAPI.setStartTime(date)
+    }
 }
 
 class localStorageApi {
@@ -44,5 +50,11 @@ class localStorageApi {
     }
     updateList(listKey, list) {
         localStorage.setItem(listKey, JSON.stringify(list))
+    }
+    getStartTime() {
+        return localStorage.getItem('StartOfTheDay')
+    }
+    setStartTime(date) {
+        localStorage.setItem('StartOfTheDay', date)
     }
 }
