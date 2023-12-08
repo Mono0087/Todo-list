@@ -113,7 +113,7 @@ export const run = () => {
             let startTime = new Date(StorageClient.getStartTime())
             let currentTime = new Date()
             startHour = getHours(startTime)
-            if (+differenceInHours(startTime, currentTime) > 24) {
+            if (+differenceInHours(currentTime, startTime) > 24) {
                 setStartTime(startHour)
                 updateEverydayTasks()
             }
