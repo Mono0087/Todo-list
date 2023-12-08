@@ -149,6 +149,12 @@ export const run = () => {
                 FormTaskApi.hideForm()
                 Event.preventDefault()
                 break;
+            case 'save-everyday-task-btn':
+                saveTask()
+                renderEverydayTodos(currentList)
+                FormEverydayTaskApi.hideForm()
+                Event.preventDefault()
+                break;
         }
         Event.stopPropagation()
     }
@@ -271,6 +277,10 @@ export const run = () => {
                 break;
             case 'delete':
                 deleteTodo(index)
+                if (currentListKey === 'defaultEverydayList.3') {
+                    renderEverydayTodos(currentList)
+                    break;
+                }
                 renderTodos(currentList)
                 break;
             case 'change':
@@ -280,7 +290,7 @@ export const run = () => {
                     let changeTaskBtn = container.querySelector('#change-task-btn')
                     changeTaskBtn.addEventListener('click', (e) => {
                         changeEverydayTask(index)
-                        renderTodos(currentList)
+                        renderEverydayTodos(currentList)
                         FormEverydayTaskApi.hideForm()
                         e.preventDefault()
                     })

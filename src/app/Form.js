@@ -73,7 +73,7 @@ class EverydayTaskForm extends Form {
         nameLabel.htmlFor = "new-title"
         const nameInput = createElement('input', null, 'new-title')
         nameInput.type = "text"
-        const saveTaskBtn = createElement('button', ['btn'], 'save-task-btn', 'Add task')
+        const saveTaskBtn = createElement('button', ['btn'], 'save-everyday-task-btn', 'Add task')
         saveTaskBtn.type = "submit"
         form.append(h2, nameLabel, nameInput, saveTaskBtn)
     }
