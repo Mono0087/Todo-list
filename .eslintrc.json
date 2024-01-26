@@ -3,10 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "extends": [
-    "airbnb-base",
-    "prettier"
-  ],
+  "extends": ["airbnb-base", "prettier"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -15,7 +12,10 @@
     "semi": ["off", "always"],
     "linebreak-style": 0,
     "indent": ["error", 2],
-    "no-console": "off"
+    "no-console": "off",
+    "max-classes-per-file": "off",
+    "no-underscore-dangle": "off"
+    
     // На windows это правило выглядело бы как
     // "linebreak-style": ["warn", "windows"]
     // А на unix системах
