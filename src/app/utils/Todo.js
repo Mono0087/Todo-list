@@ -17,4 +17,5 @@ class CustomTodo extends Todo {
     this.priority = priority
   }
 }
+
 export { Todo, CustomTodo }

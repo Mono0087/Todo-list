@@ -1,5 +1,11 @@
+import {
+  differenceInHours,
+  format,
+  getHours,
+  setHours,
+  startOfToday,
+} from 'date-fns'
 import Storage from './plugins/StorageAPI'
-import { Todo, CustomTodo } from './utils/Todo'
 
 const LISTS_LOCAL_STORAGE_KEY = 'LISTS'
 
@@ -19,6 +25,36 @@ const base = () => {
       todos: [],
     })
     _updateStorage()
+  }
+
+  const setEverydayList = (title) => {
+    lists.push({
+      name: title,
+      type: 'everydayList',
+      id: crypto.randomUUID(),
+      todos: [],
+      startOfDay: format(setHours(startOfToday(), 8), 'hh:mm:ss yyyy/MM/dd'),
+    })
+    _updateStorage()
+  }
+
+  const setStartOfDay = (hour) => {
+    const list = lists.find((el) => el.type === 'everydayList')
+    list.startOfDay = format(
+      setHours(startOfToday(), hour),
+      'hh:mm:ss yyyy/MM/dd'
+    )
+    _updateStorage()
+  }
+
+  const timeUpdate = () => {
+    const list = lists.find((el) => el.type === 'everydayList')
+    const start = list.startOfDay
+    const isNextDay = differenceInHours(new Date(), start) > 24
+    if (isNextDay) {
+      const startHour = getHours(start)
+      setStartOfDay(startHour)
+    }
   }
 
   const getList = (listId) => lists.find((list) => list.id === listId)
@@ -67,36 +103,20 @@ const base = () => {
     })
   }
 
-
   const publicMethods = {
     lists,
     setList,
     getList,
+    setEverydayList,
+    setStartOfDay,
     deleteList,
     changeList,
     addTodo,
     deleteTodo,
     changeTodo,
+    timeUpdate,
   }
   return publicMethods
 }
 
 export default base
-
-/* 
-class EverydayList extends List {
-  #startOfDay = format(setHours(startOfToday(), 8), 'hh:mm:ss yyyy/MM/dd')
-
-  constructor() {
-    super('Everyday')
-    this.setStartOfDay(8)
-    lists.push(this)
-    _updateStorage()
-  }
-
-  setStartOfDay(hour) {
-    this.#startOfDay = format(
-      setHours(this.#startOfDay, hour),
-      'hh:mm:ss yyyy/MM/dd'
-    )
-  } */
