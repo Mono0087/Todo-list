@@ -33,7 +33,7 @@ const base = () => {
       type: 'everydayList',
       id: crypto.randomUUID(),
       todos: [],
-      startOfDay: format(setHours(startOfToday(), 8), 'hh:mm:ss yyyy/MM/dd'),
+      startOfDay: format(setHours(startOfToday(), 8), 'HH:mm:ss yyyy/MM/dd'),
     })
     _updateStorage()
   }
@@ -42,7 +42,7 @@ const base = () => {
     const list = lists.find((el) => el.type === 'everydayList')
     list.startOfDay = format(
       setHours(startOfToday(), hour),
-      'hh:mm:ss yyyy/MM/dd'
+      'HH:mm:ss yyyy/MM/dd'
     )
     _updateStorage()
   }

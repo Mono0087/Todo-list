@@ -6,7 +6,7 @@ class Todo {
     this.id = crypto.randomUUID()
     this.checked = false
     // new Date(Date.parse(date))
-    this.creationDate = format(new Date(), 'hh:mm:ss yyyy/MM/dd')
+    this.creationDate = format(new Date(), 'HH:mm:ss yyyy/MM/dd')
   }
 }
 

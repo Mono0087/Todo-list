@@ -16,3 +16,5 @@ if (app.lists.length === 0) {
 }
 
 app.timeUpdate()
+
+window.app = app
