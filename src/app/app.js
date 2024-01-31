@@ -68,10 +68,10 @@ const base = () => {
     })
   }
 
-  const changeList = (listId, newList) => {
+  const renameList = (listId, newTitle) => {
     lists.forEach((list, i) => {
       if (list.id === listId) {
-        lists[i] = newList
+        lists[i].name = newTitle
         _updateStorage()
       }
     })
@@ -80,7 +80,7 @@ const base = () => {
   const addTodo = (listId, newTodo) => {
     const list = lists.find((li) => li.id === listId)
     list.todos.push(newTodo)
-    changeList(listId, list)
+    _updateStorage()
   }
 
   const deleteTodo = (listId, todoId) => {
@@ -88,9 +88,9 @@ const base = () => {
     list.todos.forEach((todo, i) => {
       if (todo.id === todoId) {
         list.todos.splice(i, 1)
-        changeList(listId, list)
       }
     })
+    _updateStorage()
   }
 
   const changeTodo = (listId, todoId, newTodo) => {
@@ -98,9 +98,9 @@ const base = () => {
     list.todos.forEach((todo, i) => {
       if (todo.id === todoId) {
         list.todos[i] = newTodo
-        changeList(listId, list)
       }
     })
+    _updateStorage()
   }
 
   const publicMethods = {
@@ -110,7 +110,7 @@ const base = () => {
     setEverydayList,
     setStartOfDay,
     deleteList,
-    changeList,
+    renameList,
     addTodo,
     deleteTodo,
     changeTodo,
@@ -120,6 +120,5 @@ const base = () => {
 }
 
 const app = base()
-
 
 export default app

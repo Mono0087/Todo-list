@@ -1,8 +1,7 @@
 /* eslint-disable indent */
 import app from './app/app'
-import { Todo, CustomTodo } from './app/utils/Todo'
 import DOM from './app/plugins/DOM'
-import { ListForm } from './app/plugins/Forms'
+import { listForm, renameListForm } from './app/plugins/Forms'
 import './SCSS/style.scss'
 
 // CACHE DOM /////////////////////////////////////////////////////////////
@@ -13,19 +12,26 @@ const nav = container.querySelector('nav')
 
 const navClickHandler = (Event) => {
   const target = Event.target.dataset.navEl
-  let listId
   switch (target) {
     case 'list-item-btn': {
-      listId = Event.target.parentElement.dataset.listId
+      const { listId } = Event.target.parentElement.dataset
       break
     }
     case 'add-project-btn':
-      ListForm.showForm()
+      listForm.showForm()
       break
-    case 'delete-list-btn':
-      app.deleteList(Event.target.closest('[data-list-id]').dataset.listId)
+    case 'delete-list-btn': {
+      const { listId } = Event.target.closest('[data-list-id]').dataset
+      app.deleteList(listId)
       DOM.updateLists()
       break
+    }
+    case 'rename-list-btn': {
+      const { listId } = Event.target.closest('[data-list-id]').dataset
+      renameListForm.showForm(listId)
+      DOM.updateLists()
+      break
+    }
     default:
       break
   }

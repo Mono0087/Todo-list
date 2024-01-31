@@ -14,7 +14,8 @@
     "indent": ["error", 2],
     "no-console": "off",
     "max-classes-per-file": "off",
-    "no-underscore-dangle": "off"
+    "no-underscore-dangle": "off",
+    "no-restricted-syntax": "off"
     
     // На windows это правило выглядело бы как
     // "linebreak-style": ["warn", "windows"]

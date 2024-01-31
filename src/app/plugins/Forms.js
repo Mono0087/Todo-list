@@ -1,4 +1,3 @@
-import createElement from '../utils/createElement'
 import app from '../app'
 import DOM from './DOM'
 
@@ -8,7 +7,7 @@ const _hideOverlay = () => {
   overlay.classList.add('visually-hidden')
   overlay.addEventListener(
     'transitionend',
-    (e) => {
+    () => {
       overlay.classList.add('hidden')
     },
     {
@@ -26,21 +25,32 @@ const _showOverlay = () => {
   }, 5)
 }
 
+const _handleOverlayClick = (self) => {
+  overlay.addEventListener(
+    'click',
+    (Event) => {
+      if (Event.target.closest('#pop-up-form')) return
+      self.hideForm()
+    },
+    { once: true }
+  )
+}
+
 const _checkValidity = (formData) => {
-  for (let data of formData) {
+  for (const data of formData) {
     if (data[1] === '') return false
   }
   return true
 }
 
-const ListForm = {
+const listForm = {
   showForm() {
     const formEl = document.createElement('form')
     formEl.id = 'pop-up-form'
     formEl.action = 'post'
     formEl.insertAdjacentHTML(
       'afterbegin',
-      `<h2>Add project</h2>
+      `<h2>Add list</h2>
        <label for="new-title">Title:</label>
        <input id="new-title" name= "title" type="text" />
        <p class="error-para" data-error-para>All fields must be filled up!</p>
@@ -49,23 +59,13 @@ const ListForm = {
          id="save-list-btn"
          type="submit"
        >
-         Add project
+         Add list
        </button>`
     )
     formEl.addEventListener('submit', this.checkForm.bind(this))
     overlay.appendChild(formEl)
     _showOverlay()
-
-    const abortSignal = new AbortController()
-    overlay.addEventListener(
-      'click',
-      (Event) => {
-        if (Event.target.closest('#pop-up-form')) return
-        this.hideForm()
-        abortSignal.abort()
-      },
-      { signal: abortSignal.signal }
-    )
+    _handleOverlayClick(this)
   },
 
   hideForm() {
@@ -89,4 +89,54 @@ const ListForm = {
   },
 }
 
-export { ListForm }
+const renameListForm = {
+  listId: null,
+
+  showForm(listId) {
+    this.listId = listId
+
+    const formEl = document.createElement('form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<h2>Rename list</h2>
+       <label for="new-title">Title:</label>
+       <input id="new-title" name= "title" type="text" />
+       <p class="error-para" data-error-para>All fields must be filled up!</p>
+       <button
+         class="btn"
+         id="save-list-btn"
+         type="submit"
+       >
+         Rename
+       </button>`
+    )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  hideForm() {
+    _hideOverlay()
+    overlay.innerHTML = ''
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
+    const formEl = overlay.querySelector('form')
+    const formData = new FormData(formEl)
+    const isValid = _checkValidity(formData)
+    if (!isValid) {
+      formEl.querySelector('[data-error-para]').classList.add('error-active')
+      return
+    }
+    const title = formData.get('title')
+    app.renameList(this.listId, title)
+    DOM.updateLists()
+    this.hideForm()
+  },
+}
+
+export { listForm, renameListForm }
