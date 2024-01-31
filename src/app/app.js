@@ -30,7 +30,7 @@ const base = () => {
   const setEverydayList = (title) => {
     lists.push({
       name: title,
-      type: 'everydayList',
+      type: 'everyday',
       id: crypto.randomUUID(),
       todos: [],
       startOfDay: format(setHours(startOfToday(), 8), 'HH:mm:ss yyyy/MM/dd'),
@@ -39,7 +39,7 @@ const base = () => {
   }
 
   const setStartOfDay = (hour) => {
-    const list = lists.find((el) => el.type === 'everydayList')
+    const list = lists.find((el) => el.type === 'everyday')
     list.startOfDay = format(
       setHours(startOfToday(), hour),
       'HH:mm:ss yyyy/MM/dd'
@@ -48,7 +48,7 @@ const base = () => {
   }
 
   const timeUpdate = () => {
-    const list = lists.find((el) => el.type === 'everydayList')
+    const list = lists.find((el) => el.type === 'everyday')
     const start = list.startOfDay
     const isNextDay = differenceInHours(new Date(), start) > 24
     if (isNextDay) {
@@ -119,4 +119,7 @@ const base = () => {
   return publicMethods
 }
 
-export default base
+const app = base()
+
+
+export default app

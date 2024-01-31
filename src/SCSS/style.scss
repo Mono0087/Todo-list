@@ -1,6 +1,6 @@
-@import "./reset.css";
-@import "config";
-@import "fonts";
+@import './reset.css';
+@import 'config';
+@import 'fonts';
 * {
   box-sizing: border-box;
 }
@@ -11,7 +11,7 @@ html {
 
 body {
   background-color: $bg-main;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   color: $main-color;
   font-size: calc(clamp(1rem, 1vw, 38px));
 }
@@ -129,8 +129,8 @@ a {
   grid-template-columns: calc(min(28ch, 100%)) auto;
   color: #fff;
   grid-template-areas:
-    "header header"
-    "nav main";
+    'header header'
+    'nav main';
   header {
     grid-area: header;
     background-color: $main-theme;
@@ -185,8 +185,10 @@ a {
       }
       .dropdown-content {
         position: fixed;
+        flex-direction: column;
         display: none;
-        padding: 5px;
+        padding: 10px;
+        gap: 5px;
         border-radius: 5px;
         background-color: $bg-main;
         box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
@@ -196,9 +198,9 @@ a {
           font-size: calc(clamp(1rem, 1vw, 38px));
           color: $main-color;
         }
-        &-open {
-          display: block;
-        }
+      }
+      [data-dropdown-visible] {
+        display: flex;
       }
     }
   }
@@ -276,7 +278,7 @@ a {
     #add-todo-btn {
       align-self: end;
     }
-    #start-time-btn{
+    #start-time-btn {
       background-color: $bg-main;
       color: $main-color;
       margin: 0;
@@ -321,11 +323,41 @@ a {
   box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border,
     1px 2px 1px $border, 3px 2px 1px $border, 2px 3px 1px $border;
   input {
+    width: 100%;
     border-radius: 5px;
     padding: 3px 5px;
     margin: 0 0 15px;
   }
 }
+
+.error-para {
+  display: none;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  background-color: $bg-main;
+  color: $main-theme;
+  position: relative;
+  &::after {
+    content: '!';
+    color: #fff;
+    font-size: 10px;
+    padding-top: 2px;
+    text-align: center;
+    width: 13px;
+    height: 13px;
+    background-color: #b91a1a;
+    position: absolute;
+    border-radius: 50%;
+    right: -4px;
+    bottom: -4px;
+  }
+}
+
+.error-active {
+  display: block;
+  padding: 10px;
+}
+
 
 // MEDIA /////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////
