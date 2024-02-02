@@ -58,13 +58,18 @@ const _createCustomListEl = (list) => {
   return listEl
 }
 
-const _renderDefaultList = (list) => {
+const _renderListEl = (list) => {
   currentListId = list.id
   main.innerHTML = ''
   main.insertAdjacentHTML(
     'afterbegin',
     `<div class="list-container" data-list-container>
-      <h2 id="list-title">${list.name}</h2>
+    <div class="list-top">
+    <h2 id="list-title">${list.name}</h2>
+    <ul class="list_controls">
+        <li><button class="btn sort-btn">Sort ↕️</button></li>
+      </ul>
+    </div>
       <ul class="todos-container" data-todos-container>
       </ul>
       <button class="btn" id="add-todo-btn" data-list-el="add-todo">Add task</button>
@@ -84,6 +89,35 @@ const _renderDefaultList = (list) => {
           <button class="priority-icon" data-priority='${todo.priority}'">
             ✗
           </button>
+        </div>
+      </div>
+    </li>`
+    todosContainer.insertAdjacentHTML('beforeend', todoEl)
+  })
+}
+
+const _renderEverydayListEl = (list) => {
+  currentListId = list.id
+  main.innerHTML = ''
+  main.insertAdjacentHTML(
+    'afterbegin',
+    `<div class="list-container everyday-list-container" data-list-container>
+      <h2 id="list-title">Everyday</h2>
+      <ul class="todos-container" data-todos-container>
+      </ul>
+      <button class="btn" id="add-todo-btn" data-list-el="add-everyday-todo">Add task</button>
+    </div>`
+  )
+
+  const todosContainer = main.querySelector('[data-todos-container]')
+  list.todos.forEach((todo) => {
+    const todoEl = `
+    <li class="todo-item">
+      <div class="todo-container" data-todo-element data-todo-id="${todo.id}">
+        <button class="todo-title ${todo.checked ? 'checked' : ''}" data-list-el="todo-title">${todo.title}</button>
+        <div class="todo-info-container">
+          <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
+          <button class="btn change-todo-btn" data-list-el="change-everyday-todo">✎</button>
         </div>
       </div>
     </li>`
@@ -116,15 +150,13 @@ const DOM = {
   },
 
   renderList(listId = currentListId) {
-    const list = app.getList(listId)
+    const list = app.getList(listId) ?? app.getList(app.lists[0].id)
     switch (list.type) {
-      case 'default':
-        _renderDefaultList(list)
-        break
       case 'everyday':
+        _renderEverydayListEl(list)
         break
-
       default:
+        _renderListEl(list)
         break
     }
   },

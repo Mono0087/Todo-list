@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import app from '../app'
 import DOM from './DOM'
-import { Todo, CustomTodo } from '../modules/Todo'
+import { Todo, CustomTodo } from "./Todo"
 
 const overlay = document.querySelector('#overlay')
 
@@ -82,6 +82,7 @@ const listForm = {
     const isValid = _checkValidity(formData)
     if (!isValid) {
       formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
       return
     }
     const data = formData.get('title')
@@ -120,9 +121,10 @@ const renameListForm = {
     _handleOverlayClick(this)
   },
 
-  hideForm() {
+  closeForm() {
     _hideOverlay()
     overlay.innerHTML = ''
+    DOM.renderList()
   },
 
   checkForm(Event) {
@@ -132,12 +134,13 @@ const renameListForm = {
     const isValid = _checkValidity(formData)
     if (!isValid) {
       formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
       return
     }
     const title = formData.get('title')
     app.renameList(this.listId, title)
     DOM.updateLists()
-    this.hideForm()
+    this.closeForm()
   },
 }
 
@@ -183,6 +186,7 @@ const todoForm = {
     const isValid = _checkValidity(formData)
     if (!isValid) {
       formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
       return
     }
     const todo = new CustomTodo(
@@ -200,7 +204,7 @@ const changeTodoForm = {
     this.listId = DOM.getCurrentListId()
     const todo = app.getTodo(this.listId, todoId)
     this.todoId = todo.id
-    const formattedDate = format(todo.dueDate, 'yyyy-dd-MM')
+    const formattedDate = format(todo.dueDate, 'yyyy-MM-dd')
     const formEl = document.createElement('form')
     formEl.id = 'pop-up-form'
     formEl.action = 'post'
@@ -214,6 +218,57 @@ const changeTodoForm = {
         <input id="new-due-date" name="dueDate" type="date" value="${formattedDate}" />
         <label for="new-priority">Priority:</label>
         <input id="new-priority" name="priority" type="number" min="0" max="4" value="${todo.priority}" />
+        <p class="error-para" data-error-para>All fields must be filled up!</p>
+          <button
+          class="btn"
+          id="save-task-btn"
+          type="submit">
+          Change task
+        </button>
+      </form>`
+    )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  closeForm() {
+    _hideOverlay()
+    overlay.innerHTML = ''
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
+    const formEl = overlay.querySelector('form')
+    const formData = new FormData(formEl)
+    const isValid = _checkValidity(formData)
+    if (!isValid) {
+      formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
+      return
+    }
+    const todo = new CustomTodo(
+      formData.get('title'),
+      formData.get('dueDate'),
+      formData.get('priority')
+    )
+    DOM.changeTodo(this.todoId, todo)
+    this.closeForm()
+  },
+}
+
+const everydayTodoForm = {
+  showForm() {
+    const formEl = document.createElement('form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<form id="pop-up-form" action="post">
+        <h2>Add Task</h2>
+        <label for="new-title">Task:</label>
+        <input id="new-title" name="title" type="text" />
         <p class="error-para" data-error-para>All fields must be filled up!</p>
           <button
           class="btn"
@@ -241,16 +296,70 @@ const changeTodoForm = {
     const isValid = _checkValidity(formData)
     if (!isValid) {
       formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
       return
     }
-    const todo = new CustomTodo(
-      formData.get('title'),
-      formData.get('dueDate'),
-      formData.get('priority')
+    const todo = new Todo(formData.get('title'))
+    DOM.addTodo(todo)
+    this.closeForm()
+  },
+}
+
+const changeEverydayTodoForm = {
+  showForm(todoId) {
+    this.listId = DOM.getCurrentListId()
+    const todo = app.getTodo(this.listId, todoId)
+    this.todoId = todo.id
+    const formEl = document.createElement('form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<form id="pop-up-form" action="post">
+        <h2>Change Task</h2>
+        <label for="new-title">Task:</label>
+        <input id="new-title" name="title" type="text" value="${todo.title}" />
+        <p class="error-para" data-error-para>All fields must be filled up!</p>
+          <button
+          class="btn"
+          id="save-task-btn"
+          type="submit">
+          Change task
+        </button>
+      </form>`
     )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  closeForm() {
+    _hideOverlay()
+    overlay.innerHTML = ''
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
+    const formEl = overlay.querySelector('form')
+    const formData = new FormData(formEl)
+    const isValid = _checkValidity(formData)
+    if (!isValid) {
+      formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
+      return
+    }
+    const todo = new Todo(formData.get('title'))
     DOM.changeTodo(this.todoId, todo)
     this.closeForm()
   },
 }
 
-export { listForm, renameListForm, todoForm, changeTodoForm }
+export {
+  listForm,
+  renameListForm,
+  todoForm,
+  changeTodoForm,
+  everydayTodoForm,
+  changeEverydayTodoForm,
+}

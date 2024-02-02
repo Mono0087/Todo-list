@@ -6,6 +6,8 @@ import {
   renameListForm,
   todoForm,
   changeTodoForm,
+  everydayTodoForm,
+  changeEverydayTodoForm
 } from './app/modules/Forms'
 import './SCSS/style.scss'
 
@@ -31,6 +33,7 @@ const navClickHandler = (Event) => {
       const { listId } = Event.target.closest('[data-list-id]').dataset
       app.deleteList(listId)
       DOM.updateLists()
+      DOM.renderList()
       break
     }
     case 'rename-list-btn': {
@@ -67,6 +70,15 @@ const listClickHandler = (Event) => {
       {
         const { todoId } = Event.target.closest('[data-todo-element]').dataset
         changeTodoForm.showForm(todoId)
+      }
+      break
+    case 'add-everyday-todo':
+      everydayTodoForm.showForm()
+      break
+    case 'change-everyday-todo':
+      {
+        const { todoId } = Event.target.closest( '[data-todo-element]' ).dataset
+        changeEverydayTodoForm.showForm( todoId )
       }
       break
     default:

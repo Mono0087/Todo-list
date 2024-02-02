@@ -217,6 +217,12 @@ a {
       background-color: $main-theme;
       @extend %padding, %flex-column-rules;
       align-items: start;
+      .list-top{
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
     }
     .todos-container {
       @extend %flex-column-rules;

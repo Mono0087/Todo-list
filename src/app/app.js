@@ -54,6 +54,12 @@ const base = () => {
     if (isNextDay) {
       const startHour = getHours(start)
       setStartOfDay(startHour)
+      lists[2].todos.forEach((todo) => {
+        console.log(todo)
+        // eslint-disable-next-line no-param-reassign
+        todo.checked = false
+      })
+      _updateStorage()
     }
   }
 
