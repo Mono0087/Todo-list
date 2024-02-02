@@ -39,7 +39,7 @@ const base = () => {
   }
 
   const setStartOfDay = (hour) => {
-    const list = lists.find((el) => el.type === 'everyday')
+    const list = lists[2]
     list.startOfDay = format(
       setHours(startOfToday(), hour),
       'HH:mm:ss yyyy/MM/dd'

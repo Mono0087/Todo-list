@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import app from '../app'
 import DOM from './DOM'
-import { Todo, CustomTodo } from "./Todo"
+import { Todo, CustomTodo } from './Todo'
 
 const overlay = document.querySelector('#overlay')
 
@@ -355,6 +355,47 @@ const changeEverydayTodoForm = {
   },
 }
 
+const setStartHourForm = {
+  showForm() {
+    const formEl = document.createElement('form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<form id="pop-up-form" action="post">
+        <h2>Set start hour:</h2>
+        <input id="new-title" type="number" name="start-hour" min="0" max="24">
+        <p class="error-para" data-error-para>All fields must be filled up!</p>
+        <button class="btn" id="change-time-btn">Set time</button>
+      </form>`
+    )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  closeForm() {
+    _hideOverlay()
+    overlay.innerHTML = ''
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
+    const formEl = overlay.querySelector('form')
+    const formData = new FormData(formEl)
+    const hour = formData.get('start-hour')
+    if (!hour) {
+      formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
+      return
+    }
+    app.setStartOfDay(Number(hour))
+    DOM.renderList()
+    this.closeForm()
+  },
+}
+
 export {
   listForm,
   renameListForm,
@@ -362,4 +403,5 @@ export {
   changeTodoForm,
   everydayTodoForm,
   changeEverydayTodoForm,
+  setStartHourForm,
 }

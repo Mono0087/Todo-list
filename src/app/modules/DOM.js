@@ -1,6 +1,7 @@
 import app from '../app'
 import DropDownMenu from './DropDownMenu'
 import createElement from '../utils/createElement'
+import { format } from 'date-fns'
 
 const container = document.querySelector('.container')
 const nav = container.querySelector('nav')
@@ -103,6 +104,8 @@ const _renderEverydayListEl = (list) => {
     'afterbegin',
     `<div class="list-container everyday-list-container" data-list-container>
       <h2 id="list-title">Everyday</h2>
+      <btn class="btn" id="start-time-btn" data-list-el="set-start-hour">Set start of the day</btn>
+      <p id="start-of-day-info">Tasks for today - ${format(list.startOfDay,'dd/MM/yyyy HH:mm')}:</p>
       <ul class="todos-container" data-todos-container>
       </ul>
       <button class="btn" id="add-todo-btn" data-list-el="add-everyday-todo">Add task</button>

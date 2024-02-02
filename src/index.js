@@ -7,7 +7,8 @@ import {
   todoForm,
   changeTodoForm,
   everydayTodoForm,
-  changeEverydayTodoForm
+  changeEverydayTodoForm,
+  setStartHourForm
 } from './app/modules/Forms'
 import './SCSS/style.scss'
 
@@ -77,9 +78,12 @@ const listClickHandler = (Event) => {
       break
     case 'change-everyday-todo':
       {
-        const { todoId } = Event.target.closest( '[data-todo-element]' ).dataset
-        changeEverydayTodoForm.showForm( todoId )
+        const { todoId } = Event.target.closest('[data-todo-element]').dataset
+        changeEverydayTodoForm.showForm(todoId)
       }
+      break
+    case 'set-start-hour':
+      setStartHourForm.showForm()
       break
     default:
       break
