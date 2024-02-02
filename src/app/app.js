@@ -5,7 +5,7 @@ import {
   setHours,
   startOfToday,
 } from 'date-fns'
-import Storage from './plugins/StorageAPI'
+import Storage from './modules/StorageAPI'
 
 const LISTS_LOCAL_STORAGE_KEY = 'LISTS'
 
@@ -83,6 +83,11 @@ const base = () => {
     _updateStorage()
   }
 
+  const getTodo = (listId, todoId) => {
+    const list = lists.find((li) => li.id === listId)
+    return list.todos.find((todo) => todo.id === todoId)
+  }
+
   const deleteTodo = (listId, todoId) => {
     const list = lists.find((li) => li.id === listId)
     list.todos.forEach((todo, i) => {
@@ -112,6 +117,7 @@ const base = () => {
     deleteList,
     renameList,
     addTodo,
+    getTodo,
     deleteTodo,
     changeTodo,
     timeUpdate,

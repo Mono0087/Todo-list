@@ -1,12 +1,18 @@
 /* eslint-disable indent */
 import app from './app/app'
-import DOM from './app/plugins/DOM'
-import { listForm, renameListForm } from './app/plugins/Forms'
+import DOM from './app/modules/DOM'
+import {
+  listForm,
+  renameListForm,
+  todoForm,
+  changeTodoForm,
+} from './app/modules/Forms'
 import './SCSS/style.scss'
 
 // CACHE DOM /////////////////////////////////////////////////////////////
 const container = document.querySelector('.container')
 const nav = container.querySelector('nav')
+const main = container.querySelector('main')
 
 // METHODS ///////////////////////////////////////////////////////////////
 
@@ -15,6 +21,7 @@ const navClickHandler = (Event) => {
   switch (target) {
     case 'list-item-btn': {
       const { listId } = Event.target.parentElement.dataset
+      DOM.renderList(listId)
       break
     }
     case 'add-project-btn':
@@ -37,6 +44,36 @@ const navClickHandler = (Event) => {
   }
 }
 
+const listClickHandler = (Event) => {
+  const target = Event.target.dataset.listEl
+  switch (target) {
+    case 'todo-title':
+      {
+        const { todoId } = Event.target.closest('[data-todo-element]').dataset
+        DOM.toggleCrossOutTodo(todoId)
+      }
+      break
+    case 'delete-todo':
+      {
+        const { todoId } = Event.target.closest('[data-todo-element]').dataset
+        DOM.deleteTodo(todoId)
+      }
+      break
+
+    case 'add-todo':
+      todoForm.showForm()
+      break
+    case 'change-todo':
+      {
+        const { todoId } = Event.target.closest('[data-todo-element]').dataset
+        changeTodoForm.showForm(todoId)
+      }
+      break
+    default:
+      break
+  }
+}
+
 // INIT //////////////////////////////////////////////////////////////////
 if (app.lists.length === 0) {
   app.setList('Today', 'default')
@@ -46,8 +83,10 @@ if (app.lists.length === 0) {
 }
 app.timeUpdate()
 DOM.updateLists()
+DOM.renderList(app.lists[0].id)
 
 // BIND EVENTS ///////////////////////////////////////////////////////////
 nav.addEventListener('click', navClickHandler)
+main.addEventListener('click', listClickHandler)
 
 window.app = app

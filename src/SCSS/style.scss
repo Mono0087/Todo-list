@@ -74,11 +74,11 @@ a {
     opacity: 0.8;
   }
 }
-
 .btn {
   padding: 5px 10px;
   transition: all 0.1s;
   cursor: pointer;
+  background-color: $bg-main;
   border: none;
   border-radius: 3px;
   box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border,
@@ -275,6 +275,21 @@ a {
         color: transparent;
       }
     }
+    [data-priority='0'] {
+      background-color: #fff;
+    }
+    [data-priority='1'] {
+      background-color: rgb(50, 194, 70);
+    }
+    [data-priority='2'] {
+      background-color: rgb(214, 212, 54);
+    }
+    [data-priority='3'] {
+      background-color: rgb(214, 145, 54);
+    }
+    [data-priority='4'] {
+      background-color: rgb(214, 80, 54);
+    }
     #add-todo-btn {
       align-self: end;
     }
@@ -357,7 +372,6 @@ a {
   display: block;
   padding: 10px;
 }
-
 
 // MEDIA /////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////

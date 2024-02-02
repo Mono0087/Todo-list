@@ -11,12 +11,12 @@
   "rules": {
     "semi": ["off", "always"],
     "linebreak-style": 0,
-    "indent": ["error", 2],
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "no-console": "off",
     "max-classes-per-file": "off",
     "no-underscore-dangle": "off",
     "no-restricted-syntax": "off"
-    
+
     // На windows это правило выглядело бы как
     // "linebreak-style": ["warn", "windows"]
     // А на unix системах

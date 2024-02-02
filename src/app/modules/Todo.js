@@ -13,7 +13,7 @@ class Todo {
 class CustomTodo extends Todo {
   constructor(title, dueDate, priority) {
     super(title)
-    this.dueDate = dueDate
+    this.dueDate = format(new Date(dueDate), 'dd/MM/yyyy')
     this.priority = priority
   }
 }
