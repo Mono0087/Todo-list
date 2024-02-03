@@ -224,6 +224,31 @@ a {
         justify-content: space-between;
       }
     }
+    .sort_dropdown-menu {
+      .dropdown-content {
+        position: absolute;
+        transform: translateX(-20%);
+        flex-direction: column;
+        display: none;
+        padding: 10px;
+        gap: 5px;
+        border-radius: 5px;
+        background-color: $bg-main;
+        box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
+          2px 1px 1px $border, 1px 2px 1px $border, 3px 2px 1px $border,
+          2px 3px 1px $border;
+        button {
+          font-size: calc(clamp(1rem, 1vw, 38px));
+          color: $main-color;
+        }
+        button{
+          background-color: $bg-main;
+        }
+      }
+      [data-dropdown-visible] {
+        display: flex;
+      }
+    }
     .todos-container {
       @extend %flex-column-rules;
       gap: 10px;

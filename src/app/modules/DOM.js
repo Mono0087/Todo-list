@@ -1,7 +1,7 @@
+import { format } from 'date-fns'
 import app from '../app'
 import DropDownMenu from './DropDownMenu'
 import createElement from '../utils/createElement'
-import { format } from 'date-fns'
 
 const container = document.querySelector('.container')
 const nav = container.querySelector('nav')
@@ -68,7 +68,23 @@ const _renderListEl = (list) => {
     <div class="list-top">
     <h2 id="list-title">${list.name}</h2>
     <ul class="list_controls">
-        <li><button class="btn sort-btn">Sort ↕️</button></li>
+        <li>
+          <div class="sort_dropdown-menu" data-dropdown>
+            <button class="btn sort-btn" data-list-el="sort" class="dropdown-btn" data-dropdown-btn>Sort ↕️</button>
+            <ul class="dropdown-content" data-dropdown-options>
+            <li>
+              <button data-list-el="sort-priority">
+                Priority !
+              </button>
+            </li>
+            <li>
+              <button data-list-el="sort-creation">
+                Creation Date 📅
+              </button>
+            </li>
+          </ul>
+          </div>
+        </li>
       </ul>
     </div>
       <ul class="todos-container" data-todos-container>
@@ -76,6 +92,8 @@ const _renderListEl = (list) => {
       <button class="btn" id="add-todo-btn" data-list-el="add-todo">Add task</button>
     </div>`
   )
+  const dropdown = main.querySelector('[data-dropdown]')
+  new DropDownMenu(dropdown).init()
 
   const todosContainer = main.querySelector('[data-todos-container]')
   list.todos.forEach((todo) => {
@@ -105,7 +123,7 @@ const _renderEverydayListEl = (list) => {
     `<div class="list-container everyday-list-container" data-list-container>
       <h2 id="list-title">Everyday</h2>
       <btn class="btn" id="start-time-btn" data-list-el="set-start-hour">Set start of the day</btn>
-      <p id="start-of-day-info">Tasks for today - ${format(list.startOfDay,'dd/MM/yyyy HH:mm')}:</p>
+      <p id="start-of-day-info">Tasks for today - ${format(list.startOfDay,'dd/MM/yyyy HH:mm')}</p>
       <ul class="todos-container" data-todos-container>
       </ul>
       <button class="btn" id="add-todo-btn" data-list-el="add-everyday-todo">Add task</button>

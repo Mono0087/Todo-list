@@ -8,7 +8,7 @@ import {
   changeTodoForm,
   everydayTodoForm,
   changeEverydayTodoForm,
-  setStartHourForm
+  setStartHourForm,
 } from './app/modules/Forms'
 import './SCSS/style.scss'
 
@@ -85,6 +85,16 @@ const listClickHandler = (Event) => {
     case 'set-start-hour':
       setStartHourForm.showForm()
       break
+    case 'sort-priority': {
+      app.sort(DOM.getCurrentListId(), 'priority')
+      DOM.renderList()
+      break
+    }
+    case 'sort-creation': {
+      app.sort( DOM.getCurrentListId(), 'creation' )
+      DOM.renderList()
+      break
+    }
     default:
       break
   }
@@ -95,7 +105,6 @@ if (app.lists.length === 0) {
   app.setList('Today', 'default')
   app.setList('Week', 'default')
   app.setEverydayList('Everyday')
-  app.setList('test', 'custom')
 }
 app.timeUpdate()
 DOM.updateLists()

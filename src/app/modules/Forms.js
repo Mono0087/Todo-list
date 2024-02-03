@@ -253,6 +253,10 @@ const changeTodoForm = {
       formData.get('dueDate'),
       formData.get('priority')
     )
+    todo.creationDate = app.getTodo(
+      DOM.getCurrentListId(),
+      this.todoId
+    ).creationDate
     DOM.changeTodo(this.todoId, todo)
     this.closeForm()
   },

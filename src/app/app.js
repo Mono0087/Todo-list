@@ -1,7 +1,10 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable consistent-return */
 import {
   differenceInHours,
   format,
   getHours,
+  isBefore,
   setHours,
   startOfToday,
 } from 'date-fns'
@@ -74,6 +77,15 @@ const base = () => {
     })
   }
 
+  const changeList = (listId, newList) => {
+    lists.forEach((list, i) => {
+      if (list.id === listId) {
+        lists[i] = newList
+        _updateStorage()
+      }
+    })
+  }
+
   const renameList = (listId, newTitle) => {
     lists.forEach((list, i) => {
       if (list.id === listId) {
@@ -114,6 +126,32 @@ const base = () => {
     _updateStorage()
   }
 
+  const sort = (listId, type) => {
+    const list = getList(listId)
+    switch (type) {
+      case 'priority': {
+        list.todos.sort((curr, next) => {
+          if (curr.priority < next.priority) return 1
+          if (curr.priority === next.priority) return 0
+          if (curr.priority > next.priority) return -1
+        })
+        changeList(listId, list)
+        break
+      }
+      case 'creation': {
+        list.todos.sort((curr, next) => {
+          if (isBefore(curr.creationDate, next.creationDate)) return 1
+          if (!isBefore(curr.creationDate, next.creationDate)) return -1
+        })
+        changeList(listId, list)
+        break
+      }
+      default:
+        break
+    }
+    _updateStorage()
+  }
+
   const publicMethods = {
     lists,
     setList,
@@ -127,6 +165,7 @@ const base = () => {
     deleteTodo,
     changeTodo,
     timeUpdate,
+    sort,
   }
   return publicMethods
 }
