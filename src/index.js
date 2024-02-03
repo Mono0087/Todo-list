@@ -113,5 +113,3 @@ DOM.renderList(app.lists[0].id)
 // BIND EVENTS ///////////////////////////////////////////////////////////
 nav.addEventListener('click', navClickHandler)
 main.addEventListener('click', listClickHandler)
-
-window.app = app

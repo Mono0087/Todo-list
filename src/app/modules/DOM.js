@@ -109,6 +109,9 @@ const _renderListEl = (list) => {
             ✗
           </button>
         </div>
+        <div class="todo-details">
+          <p>${todo.details}</p>
+        </div>
       </div>
     </li>`
     todosContainer.insertAdjacentHTML('beforeend', todoEl)

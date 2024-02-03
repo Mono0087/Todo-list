@@ -40,7 +40,7 @@ const _handleOverlayClick = (self) => {
 
 const _checkValidity = (formData) => {
   for (const data of formData) {
-    if (data[1] === '') return false
+    if (data[1] === ''&&data[0]!=='details') return false
   }
   return true
 }
@@ -155,6 +155,8 @@ const todoForm = {
         <h2>Add Task</h2>
         <label for="new-title">Task:</label>
         <input id="new-title" name="title" type="text" />
+        <label for="new-details">Details(optional):</label>
+        <textarea id="new-details" name="details"></textarea>
         <label for="new-due-date">Due date:</label>
         <input id="new-due-date" name="dueDate" type="date" />
         <label for="new-priority">Priority:</label>
@@ -191,6 +193,7 @@ const todoForm = {
     }
     const todo = new CustomTodo(
       formData.get('title'),
+      formData.get('details'),
       formData.get('dueDate'),
       formData.get('priority')
     )
@@ -214,6 +217,8 @@ const changeTodoForm = {
         <h2>Change Task</h2>
         <label for="new-title">Task:</label>
         <input id="new-title" name="title" type="text" value="${todo.title}" />
+        <label for="new-details">Details(optional):</label>
+        <textarea id="new-details" name="details">${todo.details}</textarea>
         <label for="new-due-date">Due date:</label>
         <input id="new-due-date" name="dueDate" type="date" value="${formattedDate}" />
         <label for="new-priority">Priority:</label>
@@ -250,6 +255,7 @@ const changeTodoForm = {
     }
     const todo = new CustomTodo(
       formData.get('title'),
+      formData.get('details'),
       formData.get('dueDate'),
       formData.get('priority')
     )
