@@ -12,7 +12,7 @@
     "semi": ["off", "always"],
     "linebreak-style": 0,
     "indent": ["error", 2, { "SwitchCase": 1 }],
-    "no-console": "off",
+    "no-console": "error",
     "max-classes-per-file": "off",
     "no-underscore-dangle": "off",
     "no-restricted-syntax": "off"

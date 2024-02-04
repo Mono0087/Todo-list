@@ -70,16 +70,21 @@ const _renderListEl = (list) => {
     <ul class="list_controls">
         <li>
           <div class="sort_dropdown-menu" data-dropdown>
-            <button class="btn sort-btn" data-list-el="sort" class="dropdown-btn" data-dropdown-btn>Sort ↕️</button>
+            <button class="btn sort-btn" data-list-el="sort-btn" class="dropdown-btn" data-dropdown-btn>Sort ↕️</button>
             <ul class="dropdown-content" data-dropdown-options>
             <li>
-              <button data-list-el="sort-priority">
+              <button data-list-el="sort" data-sort-type="priority">
                 Priority !
               </button>
             </li>
             <li>
-              <button data-list-el="sort-creation">
+              <button data-list-el="sort" data-sort-type="creation">
                 Creation Date 📅
+              </button>
+            </li>
+            <li>
+              <button data-list-el="sort" data-sort-type="done-first">
+                Done first ✔️
               </button>
             </li>
           </ul>
@@ -110,7 +115,7 @@ const _renderListEl = (list) => {
           </button>
         </div>
         <div class="todo-details">
-          <p>${todo.details}</p>
+          <p class="${todo.checked ? 'checked' : ''}">${todo.details}</p>
         </div>
       </div>
     </li>`

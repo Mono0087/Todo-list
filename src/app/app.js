@@ -58,7 +58,6 @@ const base = () => {
       const startHour = getHours(start)
       setStartOfDay(startHour)
       lists[2].todos.forEach((todo) => {
-        console.log(todo)
         // eslint-disable-next-line no-param-reassign
         todo.checked = false
       })
@@ -142,6 +141,14 @@ const base = () => {
         list.todos.sort((curr, next) => {
           if (isBefore(curr.creationDate, next.creationDate)) return 1
           if (!isBefore(curr.creationDate, next.creationDate)) return -1
+        })
+        changeList(listId, list)
+        break
+      }
+      case 'done-first': {
+        list.todos.sort((todo) => {
+          if (!todo.checked) return 1
+          return -1
         })
         changeList(listId, list)
         break

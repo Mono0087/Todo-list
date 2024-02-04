@@ -85,13 +85,8 @@ const listClickHandler = (Event) => {
     case 'set-start-hour':
       setStartHourForm.showForm()
       break
-    case 'sort-priority': {
-      app.sort(DOM.getCurrentListId(), 'priority')
-      DOM.renderList()
-      break
-    }
-    case 'sort-creation': {
-      app.sort( DOM.getCurrentListId(), 'creation' )
+    case 'sort': {
+      app.sort(DOM.getCurrentListId(), Event.target.dataset.sortType)
       DOM.renderList()
       break
     }

@@ -232,6 +232,12 @@ a {
         display: none;
         padding: 10px;
         gap: 5px;
+        li {
+          border-bottom: 1px dotted $border;
+          &:last-child {
+            border-bottom: none;
+          }
+        }
         border-radius: 5px;
         background-color: $bg-main;
         box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
@@ -240,13 +246,20 @@ a {
         button {
           font-size: calc(clamp(1rem, 1vw, 38px));
           color: $main-color;
-        }
-        button {
+          text-align: left;
           background-color: $bg-main;
         }
       }
       [data-dropdown-visible] {
         display: flex;
+      }
+    }
+    [data-dropdown-active] {
+      .btn {
+        border: none;
+        box-shadow: 1px 0px 1px $border, 0px 1px 1px $border,
+          2px 1px 1px $border;
+        transform: translate(1px, 1px);
       }
     }
     .todos-container {
@@ -272,7 +285,7 @@ a {
       flex-wrap: wrap;
     }
     .todo-info-container {
-      flex: 0 0 calc(max(30%, max-content));
+      flex: 0 0 auto;
       margin-left: auto;
       justify-content: end;
       align-items: center;
@@ -302,6 +315,9 @@ a {
         white-space: pre-wrap;
         font-size: calc(clamp(0.9rem, 1vw, 30px));
         max-width: 60ch;
+      }
+      .checked {
+        display: none;
       }
     }
     .priority-icon {
@@ -377,7 +393,8 @@ a {
   border-radius: 5%;
   box-shadow: 1px 0px 1px $border, 0px 1px 1px $border, 2px 1px 1px $border,
     1px 2px 1px $border, 3px 2px 1px $border, 2px 3px 1px $border;
-  input, textarea {
+  input,
+  textarea {
     width: 100%;
     border-radius: 5px;
     padding: 3px 5px;
@@ -389,10 +406,10 @@ a {
     width: 35ch;
     max-height: 20ch;
   }
-  #new-due-date{
+  #new-due-date {
     width: 15ch;
   }
-  #new-priority{
+  #new-priority {
     width: 5ch;
   }
 }
@@ -440,10 +457,10 @@ a {
 }
 
 @media (max-width: 425px) {
-  #pop-up-form{
-  width: 80vw;
-  textarea {
-    width: 100%;
-  }
+  #pop-up-form {
+    width: 80vw;
+    textarea {
+      width: 100%;
+    }
   }
 }
