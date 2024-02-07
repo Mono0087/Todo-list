@@ -159,6 +159,16 @@ const base = () => {
     _updateStorage()
   }
 
+  const sortByIds = (listId, ...ids) => {
+    const list = { ...getList(listId) }
+    const todos = []
+    list.todos.forEach((todo, i) => {
+      todos.push(getTodo(listId, ids[i]))
+    })
+    list.todos = todos
+    changeList(listId, list)
+  }
+
   const publicMethods = {
     lists,
     setList,
@@ -173,6 +183,7 @@ const base = () => {
     changeTodo,
     timeUpdate,
     sort,
+    sortByIds,
   }
   return publicMethods
 }

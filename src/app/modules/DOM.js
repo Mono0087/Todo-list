@@ -103,9 +103,13 @@ const _renderListEl = (list) => {
   const todosContainer = main.querySelector('[data-todos-container]')
   list.todos.forEach((todo) => {
     const todoEl = `
-    <li class="todo-item">
-      <div class="todo-container" data-todo-element data-todo-id="${todo.id}">
-        <button class="todo-title ${todo.checked ? 'checked' : ''}" data-list-el="todo-title">${todo.title}</button>
+    <li class="todo-item" data-todo-li>
+      <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
+  todo.id
+}">
+        <button class="todo-title ${
+  todo.checked ? 'checked' : ''
+}" data-list-el="todo-title">${todo.title}</button>
         <div class="todo-info-container">
           <span class="todo-date">${todo.dueDate}</span>
           <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
@@ -131,7 +135,10 @@ const _renderEverydayListEl = (list) => {
     `<div class="list-container everyday-list-container" data-list-container>
       <h2 id="list-title">Everyday</h2>
       <btn class="btn" id="start-time-btn" data-list-el="set-start-hour">Set start of the day</btn>
-      <p id="start-of-day-info">Tasks for today - ${format(list.startOfDay,'dd/MM/yyyy HH:mm')}</p>
+      <p id="start-of-day-info">Tasks for today - ${format(
+    list.startOfDay,
+    'dd/MM/yyyy HH:mm'
+  )}</p>
       <ul class="todos-container" data-todos-container>
       </ul>
       <button class="btn" id="add-todo-btn" data-list-el="add-everyday-todo">Add task</button>
@@ -141,9 +148,13 @@ const _renderEverydayListEl = (list) => {
   const todosContainer = main.querySelector('[data-todos-container]')
   list.todos.forEach((todo) => {
     const todoEl = `
-    <li class="todo-item">
-      <div class="todo-container" data-todo-element data-todo-id="${todo.id}">
-        <button class="todo-title ${todo.checked ? 'checked' : ''}" data-list-el="todo-title">${todo.title}</button>
+    <li class="todo-item" data-todo-li>
+      <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
+  todo.id
+}">
+        <button class="todo-title ${
+  todo.checked ? 'checked' : ''
+}" data-list-el="todo-title">${todo.title}</button>
         <div class="todo-info-container">
           <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
           <button class="btn change-todo-btn" data-list-el="change-everyday-todo">✎</button>
@@ -152,6 +163,104 @@ const _renderEverydayListEl = (list) => {
     </li>`
     todosContainer.insertAdjacentHTML('beforeend', todoEl)
   })
+}
+
+const _sortTodosByIDS = (todosContainer) => {
+  const todos = todosContainer.querySelectorAll('[data-todo-element]')
+  const ids = []
+  ;[...todos].forEach((todo) => {
+    ids.push(todo.dataset.todoId)
+  })
+  app.sortByIds(currentListId, ...ids)
+}
+
+const _addDraggableEvents = () => {
+  const todosContainer = main.querySelector('[data-todos-container]')
+  const draggables = [...todosContainer.querySelectorAll('[data-todo-element]')]
+
+  let activeLI
+  let currentDropTargetLi
+
+  nav.addEventListener('dragover', (Event) => {
+    const target = Event.target.closest('[data-list-id]')
+    if (app.getList(currentListId).type === 'everyday') return
+    if (target) {
+      if (target.classList.contains('everyday-list-item')) return
+      target.classList.add('drag-over')
+      currentDropTargetLi = target
+    }
+  })
+
+  nav.addEventListener('dragleave', (Event) => {
+    const target = Event.target.closest('[data-list-id]')
+    if (target) {
+      target.classList.remove('drag-over')
+      return
+    }
+    currentDropTargetLi = undefined
+  })
+
+  todosContainer.addEventListener('dragover', (Event) => {
+    const target = Event.target.closest('[data-todo-li]')
+    if (target && target !== activeLI) {
+      target.classList.add('drag-over')
+      currentDropTargetLi = target
+    }
+  })
+
+  todosContainer.addEventListener('dragleave', (Event) => {
+    const target = Event.target.closest('[data-todo-li]')
+    if (target) {
+      target.classList.remove('drag-over')
+      return
+    }
+    currentDropTargetLi = undefined
+  })
+
+  draggables.forEach((el) => {
+    el.addEventListener('dragstart', () => {
+      activeLI = el.closest('[data-todo-li]')
+      el.classList.add('dragging')
+      setTimeout(() => {
+        el.classList.add('hide')
+      }, 0)
+    })
+
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging', 'hide')
+      if (
+        currentDropTargetLi &&
+        currentDropTargetLi.closest('[data-list-id]')
+      ) {
+        const newListId = currentDropTargetLi.dataset.listId
+        if (newListId === currentListId) return
+        const { todoId } = el.dataset
+        const todo = app.getTodo(currentListId, todoId)
+        app.addTodo(newListId, todo)
+        app.deleteTodo(currentListId, todoId)
+        _renderListEl(app.getList(currentListId))
+        return
+      }
+      if (currentDropTargetLi) {
+        currentDropTargetLi.insertAdjacentElement('beforeBegin', activeLI)
+        _sortTodosByIDS(todosContainer)
+      }
+    })
+  })
+}
+
+const _renderList = (listId = currentListId) => {
+  const list = app.getList(listId) ?? app.getList(app.lists[0].id)
+  switch (list.type) {
+    case 'everyday':
+      _renderEverydayListEl(list)
+      break
+    default:
+      _renderListEl(list)
+      break
+  }
+
+  _addDraggableEvents()
 }
 
 const DOM = {
@@ -179,37 +288,29 @@ const DOM = {
   },
 
   renderList(listId = currentListId) {
-    const list = app.getList(listId) ?? app.getList(app.lists[0].id)
-    switch (list.type) {
-      case 'everyday':
-        _renderEverydayListEl(list)
-        break
-      default:
-        _renderListEl(list)
-        break
-    }
+    _renderList(listId)
   },
 
   addTodo(todo) {
     app.addTodo(currentListId, todo)
-    this.renderList()
+    _renderList()
   },
 
   deleteTodo(todoId) {
     app.deleteTodo(currentListId, todoId)
-    this.renderList()
+    _renderList()
   },
 
   changeTodo(todoId, newTodo) {
     app.changeTodo(currentListId, todoId, newTodo)
-    this.renderList()
+    _renderList()
   },
 
   toggleCrossOutTodo(todoId) {
     const todo = app.getTodo(currentListId, todoId)
     todo.checked = !todo.checked
     app.changeTodo(currentListId, todoId, todo)
-    this.renderList()
+    _renderList()
   },
 
   getCurrentListId() {

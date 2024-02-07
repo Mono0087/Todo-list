@@ -124,7 +124,7 @@ const renameListForm = {
   closeForm() {
     _hideOverlay()
     overlay.innerHTML = ''
-    DOM.renderList()
+    DOM._renderList()
   },
 
   checkForm(Event) {
@@ -401,7 +401,7 @@ const setStartHourForm = {
       return
     }
     app.setStartOfDay(Number(hour))
-    DOM.renderList()
+    DOM._renderList()
     this.closeForm()
   },
 }
