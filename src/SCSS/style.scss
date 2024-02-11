@@ -150,6 +150,8 @@ a {
     font-size: calc(clamp(1.2rem, 1vw, 40px));
   }
   .projects-list {
+    border-bottom: 2px solid $border;
+    border-style: dashed;
     @extend %flex-column-rules;
     padding-bottom: 15px;
     button {
@@ -170,6 +172,8 @@ a {
       @extend %text-overflow;
     }
     .list_dropdown-menu {
+      position: relative;
+      
       .dropdown-btn {
         display: flex;
         gap: 5px;
@@ -184,7 +188,8 @@ a {
         }
       }
       .dropdown-content {
-        position: fixed;
+        position: absolute;
+        transform: translateX(-75%);
         flex-direction: column;
         display: none;
         padding: 10px;
@@ -204,6 +209,11 @@ a {
       }
     }
   }
+  .notes-list-item {
+    color: #fff;
+    background-color: transparent;
+    font-size: calc(clamp(1.2rem, 1vw, 40px));
+  }
   .drag-over {
     border: 3px dashed red;
     background-color: rgb(209, 133, 133);
@@ -212,13 +222,13 @@ a {
   }
   main {
     grid-area: main;
-    padding-right: 0;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding-right: 0;
+    justify-content: center;
     @extend %add-overflow, %padding;
     .list-container {
       width: calc(min(100%, 1600px));
+      height: fit-content;
       border-radius: 15px;
       background-color: $main-theme;
       @extend %padding, %flex-column-rules;
@@ -273,6 +283,51 @@ a {
       gap: 10px;
       width: 100%;
       padding-right: 15px;
+    }
+    .notes-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(20ch, 1fr));
+      grid-auto-rows: min-content;
+      gap: 15px;
+      width: 100%;
+      padding-right: 15px;
+      .note-item {
+        color: #000;
+        background-color: $bg-main;
+        border-radius: 15px;
+        justify-content: space-around;
+        list-style: none;
+        position: relative;
+        padding: 15px 10px;
+          height: max-content;
+        .delete-note-btn {
+          border-radius: 15px;
+          width: 30px;
+          height: 30px;
+          background-color: $main-theme;
+          color: $bg-main;
+          position: absolute;
+          right: -10px;
+          top: -10px;
+        }
+        .note-info-container {
+          @extend %flex-column-rules;
+          gap: 10px;
+        }
+        input,
+        textarea {
+          padding: 0 5px;
+          border-bottom: 3px solid $main-theme;
+          border-radius: 10px;
+          width: 100%;
+        }
+        textarea {
+          resize: vertical;
+          width: 100%;
+          min-height: 15ch;
+          max-height: 30ch;
+        }
+      }
     }
     .hide {
       border: none !important;

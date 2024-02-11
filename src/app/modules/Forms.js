@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
 import app from '../app'
 import DOM from './DOM'
-import { Todo, CustomTodo } from './Todo'
+import { Todo, CustomTodo, Note } from './Todo'
 
 const overlay = document.querySelector('#overlay')
 
@@ -40,7 +40,7 @@ const _handleOverlayClick = (self) => {
 
 const _checkValidity = (formData) => {
   for (const data of formData) {
-    if (data[1] === ''&&data[0]!=='details') return false
+    if (data[1] === '' && data[0] !== 'details') return false
   }
   return true
 }
@@ -124,7 +124,7 @@ const renameListForm = {
   closeForm() {
     _hideOverlay()
     overlay.innerHTML = ''
-    DOM._renderList()
+    DOM.renderList()
   },
 
   checkForm(Event) {
@@ -406,6 +406,58 @@ const setStartHourForm = {
   },
 }
 
+const noteForm = {
+  showForm() {
+    const formEl = document.createElement('form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<form id="pop-up-form" action="post">
+        <h2>Add note</h2>
+        <label for="new-title">Title:</label>
+        <input id="new-title" name="title" type="text" />
+        <label for="new-details">Details:</label>
+        <textarea id="new-details" name="details"></textarea>
+        <p class="error-para" data-error-para>All fields must be filled up!</p>
+          <button
+          class="btn"
+          id="save-note-btn"
+          type="submit">
+          Add note
+        </button>
+      </form>`
+    )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  closeForm() {
+    _hideOverlay()
+    overlay.innerHTML = ''
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
+    const formEl = overlay.querySelector('form')
+    const formData = new FormData(formEl)
+    const isValid = _checkValidity(formData)
+    if (!isValid) {
+      formEl.querySelector('[data-error-para]').classList.add('error-active')
+      _handleOverlayClick(this)
+      return
+    }
+    const note  = new Note(
+      formData.get('title'),
+      formData.get('details')
+    )
+    DOM.addNote(note)
+    this.closeForm()
+  },
+}
+
 export {
   listForm,
   renameListForm,
@@ -413,5 +465,6 @@ export {
   changeTodoForm,
   everydayTodoForm,
   changeEverydayTodoForm,
+  noteForm,
   setStartHourForm,
 }

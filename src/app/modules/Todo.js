@@ -14,9 +14,17 @@ class CustomTodo extends Todo {
   constructor(title, details, dueDate, priority) {
     super(title)
     this.details = details
-    this.dueDate = format( new Date( dueDate ), 'yyyy/MM/dd')
+    this.dueDate = format(new Date(dueDate), 'yyyy/MM/dd')
     this.priority = priority
   }
 }
 
-export { Todo, CustomTodo }
+class Note {
+  constructor(title, details) {
+    this.title = title
+    this.details = details
+    this.id = crypto.randomUUID()
+  }
+}
+
+export { Todo, CustomTodo, Note }

@@ -125,6 +125,47 @@ const base = () => {
     _updateStorage()
   }
 
+  const setNotes = () => {
+    lists.push({
+      name: 'Notes',
+      type: 'notes',
+      id: crypto.randomUUID(),
+      notes: [],
+    })
+    _updateStorage()
+  }
+
+  const addNote = (newNote) => {
+    const list = lists.find((li) => li.type === 'notes')
+    list.notes.push(newNote)
+    _updateStorage()
+  }
+
+  const getNote = (noteId) => {
+    const list = lists.find((li) => li.type === 'notes')
+    return list.notes.find((note) => note.id === noteId)
+  }
+
+  const deleteNote = (noteId) => {
+    const list = lists.find((li) => li.type === 'notes')
+    list.notes.forEach((note, i) => {
+      if (note.id === noteId) {
+        list.notes.splice(i, 1)
+      }
+    })
+    _updateStorage()
+  }
+
+  const changeNote = (noteId, newNote) => {
+    const list = lists.find((li) => li.type === 'notes')
+    list.notes.forEach((note, i) => {
+      if (note.id === noteId) {
+        list.notes[i] = newNote
+      }
+    })
+    _updateStorage()
+  }
+
   const sort = (listId, type) => {
     const list = getList(listId)
     switch (type) {
@@ -184,6 +225,11 @@ const base = () => {
     timeUpdate,
     sort,
     sortByIds,
+    setNotes,
+    addNote,
+    getNote,
+    deleteNote,
+    changeNote,
   }
   return publicMethods
 }

@@ -46,7 +46,7 @@ export default function createElement(
   }
   if (datasetArray) {
     datasetArray.forEach((dataObj) => {
-      el.dataset[dataObj.dataKey] = dataObj.dataValue || ''
+      el.dataset[dataObj.dataKey] = dataObj.dataValue
     })
   }
   attrs.forEach((attr) => {

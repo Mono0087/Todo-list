@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import { format } from 'date-fns'
 import app from '../app'
 import DropDownMenu from './DropDownMenu'
@@ -16,7 +17,10 @@ const _createDefaultListEl = (list) => {
     null,
     null,
     null,
-    [{ dataKey: 'listId', dataValue: list.id }]
+    [
+      { dataKey: 'listId', dataValue: list.id },
+      { dataKey: 'dragAndDrop', dataValue: list.type === 'default' },
+    ]
   )
   listEl.insertAdjacentHTML(
     'afterbegin',
@@ -29,6 +33,7 @@ const _createCustomListEl = (list) => {
   const listEl = document.createElement('li')
   listEl.classList.add(`${list.type}-list-item`)
   listEl.dataset.listId = list.id
+  listEl.dataset.dragAndDrop = true
   listEl.insertAdjacentHTML(
     'afterbegin',
     `<button class="custom-list-item_btn list-item_btn" data-nav-el="list-item-btn">
@@ -56,6 +61,23 @@ const _createCustomListEl = (list) => {
   )
   const dropdown = listEl.querySelector('[data-dropdown]')
   new DropDownMenu(dropdown).init()
+  return listEl
+}
+
+const _createNotesListEl = (list) => {
+  const listEl = createElement(
+    'button',
+    [`${list.type}-list-item`],
+    null,
+    null,
+    'Notes',
+    [
+      { dataKey: 'notesEl', dataValue: '' },
+      { dataKey: 'navEl', dataValue: 'list-item-btn' },
+      { dataKey: 'listId', dataValue: list.id },
+      { dataKey: 'dragAndDrop', dataValue: false },
+    ]
+  )
   return listEl
 }
 
@@ -165,6 +187,60 @@ const _renderEverydayListEl = (list) => {
   })
 }
 
+const _renderNotesListEl = (list) => {
+  currentListId = list.id
+  main.innerHTML = ''
+  main.insertAdjacentHTML(
+    'afterbegin',
+    `<div class="list-container" data-list-container>
+      <h2 id="list-title">Notes</h2>     
+      <ul class="notes-container" data-notes-container>
+      </ul>
+      <button class="btn" id="add-note-btn" data-list-el="add-note">Add note</button>
+    </div>`
+  )
+  const notesContainer = main.querySelector('[data-notes-container]')
+  list.notes.forEach((note) => {
+    const noteEl = `
+    <li class="note-item" data-note-id="${note.id}">
+      <div class="note-container" data-note-element data-note-id="${note.id}">
+        <button class="btn delete-note-btn" data-list-el="delete-note">✗</button>
+      <div class="note-info-container">
+        <input class="note-title" name="title" data-list-el="note-title" value="${note.title}">
+        <textarea name="details">${note.details}</textarea>
+        </div>
+      </div>
+    </li>`
+
+    notesContainer.insertAdjacentHTML('beforeend', noteEl)
+  })
+
+  const debounce = (callback, wait) => {
+    let timeout
+    return (...args) => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        callback.apply(this, args)
+      }, wait)
+    }
+  }
+
+  notesContainer.addEventListener(
+    'keyup',
+    debounce((Event) => {
+      const targetNote = Event.target.closest('[data-note-id]')
+      const data = [...targetNote.querySelectorAll('input, textarea')].map(
+        (el) => el.value
+      )
+      const { noteId } = targetNote.dataset
+      const note = app.getNote(noteId)
+      note.title = data[0]
+      note.details = data[1]
+      app.changeNote(noteId, note)
+    }, 500)
+  )
+}
+
 const _sortTodosByIDS = (todosContainer) => {
   const todos = todosContainer.querySelectorAll('[data-todo-element]')
   const ids = []
@@ -183,7 +259,7 @@ const _addDraggableEvents = () => {
 
   nav.addEventListener('dragover', (Event) => {
     const target = Event.target.closest('[data-list-id]')
-    if (app.getList(currentListId).type === 'everyday') return
+    if (target && target.dataset.dragAndDrop === 'false') return
     if (target) {
       if (target.classList.contains('everyday-list-item')) return
       target.classList.add('drag-over')
@@ -254,27 +330,37 @@ const _renderList = (listId = currentListId) => {
   switch (list.type) {
     case 'everyday':
       _renderEverydayListEl(list)
+      _addDraggableEvents()
       break
+    case 'notes':
+      _renderNotesListEl(list)
+      return
     default:
       _renderListEl(list)
+      _addDraggableEvents()
       break
   }
-
-  _addDraggableEvents()
 }
 
 const DOM = {
   updateLists() {
     const defaultListsContainer = nav.querySelector('[data-default-lists]')
     const customListsContainer = nav.querySelector('[data-custom-lists]')
+    const notesBtn = nav.querySelector('[data-notes-el]')
     defaultListsContainer.innerHTML = ''
     customListsContainer.innerHTML = ''
+    if (notesBtn) notesBtn.remove()
 
     app.lists.forEach((list) => {
       switch (list.type) {
         case 'custom': {
           const listEl = _createCustomListEl(list)
           customListsContainer.appendChild(listEl)
+          break
+        }
+        case 'notes': {
+          const noteEl = _createNotesListEl(list)
+          nav.appendChild(noteEl)
           break
         }
         default:
@@ -303,6 +389,16 @@ const DOM = {
 
   changeTodo(todoId, newTodo) {
     app.changeTodo(currentListId, todoId, newTodo)
+    _renderList()
+  },
+
+  addNote(note) {
+    app.addNote(note)
+    _renderList()
+  },
+
+  deleteNote(noteId) {
+    app.deleteNote(noteId)
     _renderList()
   },
 

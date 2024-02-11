@@ -8,6 +8,7 @@ import {
   changeTodoForm,
   everydayTodoForm,
   changeEverydayTodoForm,
+  noteForm,
   setStartHourForm,
 } from './app/modules/Forms'
 import './SCSS/style.scss'
@@ -23,7 +24,7 @@ const navClickHandler = (Event) => {
   const target = Event.target.dataset.navEl
   switch (target) {
     case 'list-item-btn': {
-      const { listId } = Event.target.parentElement.dataset
+      const { listId } = Event.target.closest('[data-list-id]').dataset
       DOM.renderList(listId)
       break
     }
@@ -63,7 +64,6 @@ const listClickHandler = (Event) => {
         DOM.deleteTodo(todoId)
       }
       break
-
     case 'add-todo':
       todoForm.showForm()
       break
@@ -85,6 +85,15 @@ const listClickHandler = (Event) => {
     case 'set-start-hour':
       setStartHourForm.showForm()
       break
+    case 'add-note':
+      noteForm.showForm()
+      break
+    case 'delete-note':
+      {
+        const { noteId } = Event.target.closest('[data-note-id]').dataset
+        DOM.deleteNote(noteId)
+      }
+      break
     case 'sort': {
       app.sort(DOM.getCurrentListId(), Event.target.dataset.sortType)
       DOM.renderList()
@@ -100,6 +109,7 @@ if (app.lists.length === 0) {
   app.setList('Today', 'default')
   app.setList('Week', 'default')
   app.setEverydayList('Everyday')
+  app.setNotes()
 }
 app.timeUpdate()
 DOM.updateLists()
