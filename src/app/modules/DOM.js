@@ -170,7 +170,7 @@ const _renderEverydayListEl = (list) => {
   const todosContainer = main.querySelector('[data-todos-container]')
   list.todos.forEach((todo) => {
     const todoEl = `
-    <li class="todo-item" data-todo-li>
+    <li class="todo-item" data-todo-li data-everyday-todo>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
   todo.id
 }">
@@ -193,17 +193,20 @@ const _renderNotesListEl = (list) => {
   main.insertAdjacentHTML(
     'afterbegin',
     `<div class="list-container" data-list-container>
-      <h2 id="list-title">Notes</h2>     
+      <div class="notes-top">
+        <h2 id="list-title">Notes</h2>     
+        <input data-list-el="note-search-input" placeholder="Find note...">
+        <button class="btn" id="add-note-btn" data-list-el="add-note">Add note</button>
+      </div>
       <ul class="notes-container" data-notes-container>
       </ul>
-      <button class="btn" id="add-note-btn" data-list-el="add-note">Add note</button>
     </div>`
   )
-  const notesContainer = main.querySelector('[data-notes-container]')
-  list.notes.forEach((note) => {
+
+  const _createNoteElement = (note) => {
     const noteEl = `
     <li class="note-item" data-note-id="${note.id}">
-      <div class="note-container" data-note-element data-note-id="${note.id}">
+      <div class="note-container" data-note-element>
         <button class="btn delete-note-btn" data-list-el="delete-note">✗</button>
       <div class="note-info-container">
         <input class="note-title" name="title" data-list-el="note-title" value="${note.title}">
@@ -211,9 +214,27 @@ const _renderNotesListEl = (list) => {
         </div>
       </div>
     </li>`
+    return noteEl
+  }
 
-    notesContainer.insertAdjacentHTML('beforeend', noteEl)
+  const notesContainer = main.querySelector('[data-notes-container]')
+  list.notes.forEach((note) => {
+    notesContainer.insertAdjacentHTML('beforeend', _createNoteElement(note))
   })
+
+  const _filterNotes = (Event) => {
+    notesContainer.innerHTML = ''
+    list.notes.forEach((note) => {
+      if (note.title.includes(Event.target.value)) {
+        notesContainer.insertAdjacentHTML('beforeend', _createNoteElement(note))
+      }
+    })
+  }
+
+  const searchNoteInput = main.querySelector(
+    '[data-list-el="note-search-input"]'
+  )
+  searchNoteInput.addEventListener('input', _filterNotes)
 
   const debounce = (callback, wait) => {
     let timeout
@@ -260,11 +281,12 @@ const _addDraggableEvents = () => {
   nav.addEventListener('dragover', (Event) => {
     const target = Event.target.closest('[data-list-id]')
     if (target && target.dataset.dragAndDrop === 'false') return
-    if (target) {
-      if (target.classList.contains('everyday-list-item')) return
-      target.classList.add('drag-over')
-      currentDropTargetLi = target
-    }
+    if (activeLI && !activeLI.hasAttribute('data-everyday-todo'))
+      if (target) {
+        if (target.classList.contains('everyday-list-item')) return
+        target.classList.add('drag-over')
+        currentDropTargetLi = target
+      }
   })
 
   nav.addEventListener('dragleave', (Event) => {

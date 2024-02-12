@@ -173,7 +173,7 @@ a {
     }
     .list_dropdown-menu {
       position: relative;
-      
+
       .dropdown-btn {
         display: flex;
         gap: 5px;
@@ -284,6 +284,25 @@ a {
       width: 100%;
       padding-right: 15px;
     }
+
+    .notes-top {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      input,
+      #add-note-btn {
+        margin-left: auto;
+      }
+      input {
+        border: 3px solid $main-theme-light;
+        border-radius: 10px;
+        padding: 5px;
+      }
+    }
+
     .notes-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(20ch, 1fr));
@@ -291,6 +310,7 @@ a {
       gap: 15px;
       width: 100%;
       padding-right: 15px;
+
       .note-item {
         color: #000;
         background-color: $bg-main;
@@ -299,7 +319,7 @@ a {
         list-style: none;
         position: relative;
         padding: 15px 10px;
-          height: max-content;
+        height: max-content;
         .delete-note-btn {
           border-radius: 15px;
           width: 30px;
