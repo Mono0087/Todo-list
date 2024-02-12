@@ -401,7 +401,7 @@ const setStartHourForm = {
       return
     }
     app.setStartOfDay(Number(hour))
-    DOM._renderList()
+    DOM.renderList()
     this.closeForm()
   },
 }

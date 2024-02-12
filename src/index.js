@@ -17,6 +17,7 @@ import './SCSS/style.scss'
 const container = document.querySelector('.container')
 const nav = container.querySelector('nav')
 const main = container.querySelector('main')
+const exportFileLink = container.querySelector('[data-export-link]')
 
 // METHODS ///////////////////////////////////////////////////////////////
 
@@ -118,3 +119,7 @@ DOM.renderList(app.lists[0].id)
 // BIND EVENTS ///////////////////////////////////////////////////////////
 nav.addEventListener('click', navClickHandler)
 main.addEventListener('click', listClickHandler)
+exportFileLink.addEventListener('click', (Event)=>{
+  Event.preventDefault()
+  DOM.openListsExportTab()
+})

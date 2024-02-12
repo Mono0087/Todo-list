@@ -225,7 +225,7 @@ const _renderNotesListEl = (list) => {
   const _filterNotes = (Event) => {
     notesContainer.innerHTML = ''
     list.notes.forEach((note) => {
-      if (note.title.includes(Event.target.value)) {
+      if (note.title.toLowerCase().includes(Event.target.value.toLowerCase())) {
         notesContainer.insertAdjacentHTML('beforeend', _createNoteElement(note))
       }
     })
@@ -433,6 +433,13 @@ const DOM = {
 
   getCurrentListId() {
     return currentListId
+  },
+
+  openListsExportTab() {
+    const newWindow = window.open('', '')
+    newWindow.document.write(
+      `<p>Copy the code below:</p> ${JSON.stringify(app.lists)}`
+    )
   },
 }
 
