@@ -28,14 +28,10 @@ const _showOverlay = () => {
 }
 
 const _handleOverlayClick = (self) => {
-  overlay.addEventListener(
-    'click',
-    (Event) => {
-      if (Event.target.closest('#pop-up-form')) return
-      self.closeForm()
-    },
-    { once: true }
-  )
+  overlay.addEventListener('click', (Event) => {
+    if (Event.target.closest('#pop-up-form')) return
+    self.closeForm()
+  })
 }
 
 const _checkValidity = (formData) => {
@@ -449,11 +445,94 @@ const noteForm = {
       _handleOverlayClick(this)
       return
     }
-    const note  = new Note(
-      formData.get('title'),
-      formData.get('details')
-    )
+    const note = new Note(formData.get('title'), formData.get('details'))
     DOM.addNote(note)
+    this.closeForm()
+  },
+}
+
+const settingsModal = {
+  show() {
+    const formEl = document.createElement('form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<form id="pop-up-form" action="post">
+        <h2>Settings</h2>
+        <button class="btn close-settings-btn" data-close-settings-btn>✗</button>
+        <fieldset id="import-export-setting">
+          <legend>Import/Export</legend>
+          <label for="import-export-input">Copy/past this text for import/export:</label>
+          <div class="import-export-container">
+            <textarea id="import-export-input" name="import/export">${JSON.stringify(
+    app.lists
+  )}</textarea>
+            <span id="copy-message">Copied!</span>
+          </div>
+          <button class="export-btn btn" data-export-btn>Copy file↗</button>
+          <button class="save-import-btn btn" data-import-btn data-title="Make sure you are putting the data in the correct format!">Save file💾</button>
+        </fieldset>
+        <button
+          class="btn"
+          id="save-settings-btn"
+          type="submit">
+          Save
+        </button>
+      </form>`
+    )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+
+    const exportBtn = formEl.querySelector('[data-export-btn]')
+    const importBtn = formEl.querySelector('[data-import-btn]')
+
+    exportBtn.addEventListener('click', (Event) => {
+      Event.preventDefault()
+      const textInput = formEl.querySelector('[name="import/export"]')
+      textInput.select()
+      textInput.setSelectionRange(0, 99999)
+      navigator.clipboard.writeText(textInput.value)
+      textInput.classList.add('copied')
+      setTimeout(() => {
+        textInput.classList.remove('copied')
+      }, 5000)
+    })
+
+    importBtn.addEventListener('click', (Event) => {
+      Event.preventDefault()
+      const listsData = formEl.querySelector('[name="import/export"]')
+      try {
+        JSON.parse(listsData.value)
+      } catch (e) {
+        listsData.value = 'Wrong format!\nShould be [{...}{...}...]'
+        return
+      }
+
+      if (Array.isArray(JSON.parse(listsData.value))) {
+        importBtn.dataset.title = 'Saved!'
+        app.updateStorage(JSON.parse(listsData.value))
+        setTimeout(() => {
+          importBtn.dataset.title =
+            'Make sure you are putting the data in the correct format!'
+        }, 5000)
+        return
+      }
+      listsData.value = 'Wrong format!\nShould be [{...}{...}...]'
+    })
+
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  closeForm() {
+    _hideOverlay()
+    window.location.reload()
+    overlay.innerHTML = ''
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
     this.closeForm()
   },
 }
@@ -467,4 +546,5 @@ export {
   changeEverydayTodoForm,
   noteForm,
   setStartHourForm,
+  settingsModal,
 }

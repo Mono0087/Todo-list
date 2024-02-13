@@ -10,6 +10,7 @@ import {
   changeEverydayTodoForm,
   noteForm,
   setStartHourForm,
+  settingsModal,
 } from './app/modules/Forms'
 import './SCSS/style.scss'
 
@@ -17,7 +18,7 @@ import './SCSS/style.scss'
 const container = document.querySelector('.container')
 const nav = container.querySelector('nav')
 const main = container.querySelector('main')
-const exportFileLink = container.querySelector('[data-export-link]')
+const settingsBtn = container.querySelector('[data-settings-btn]')
 
 // METHODS ///////////////////////////////////////////////////////////////
 
@@ -119,7 +120,6 @@ DOM.renderList(app.lists[0].id)
 // BIND EVENTS ///////////////////////////////////////////////////////////
 nav.addEventListener('click', navClickHandler)
 main.addEventListener('click', listClickHandler)
-exportFileLink.addEventListener('click', (Event)=>{
-  Event.preventDefault()
-  DOM.openListsExportTab()
+settingsBtn.addEventListener('click', () => {
+  settingsModal.show()
 })

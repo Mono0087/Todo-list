@@ -129,16 +129,18 @@ const _renderListEl = (list) => {
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
   todo.id
 }">
-        <button class="todo-title ${
+        <div class="todo_top-container">
+          <button class="todo-title ${
   todo.checked ? 'checked' : ''
 }" data-list-el="todo-title">${todo.title}</button>
-        <div class="todo-info-container">
-          <span class="todo-date">${todo.dueDate}</span>
-          <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
-          <button class="btn change-todo-btn" data-list-el="change-todo">✎</button>
-          <button class="priority-icon" data-priority='${todo.priority}'">
-            ✗
-          </button>
+          <div class="todo-info-container">
+            <span class="todo-date">${todo.dueDate}</span>
+            <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
+            <button class="btn change-todo-btn" data-list-el="change-todo">✎</button>
+            <button class="priority-icon" data-priority='${todo.priority}'">
+              ✗
+            </button>
+          </div>
         </div>
         <div class="todo-details">
           <p class="${todo.checked ? 'checked' : ''}">${todo.details}</p>
@@ -433,13 +435,6 @@ const DOM = {
 
   getCurrentListId() {
     return currentListId
-  },
-
-  openListsExportTab() {
-    const newWindow = window.open('', '')
-    newWindow.document.write(
-      `<p>Copy the code below:</p> ${JSON.stringify(app.lists)}`
-    )
   },
 }
 

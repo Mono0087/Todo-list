@@ -16,8 +16,8 @@ const base = () => {
   const StorageClient = new Storage('localStorage')
   const lists = StorageClient.getTodoLists(LISTS_LOCAL_STORAGE_KEY) || []
 
-  const _updateStorage = () => {
-    StorageClient.setTodoLists(lists, LISTS_LOCAL_STORAGE_KEY)
+  const updateStorage = (listsData = lists) => {
+    StorageClient.setTodoLists(listsData, LISTS_LOCAL_STORAGE_KEY)
   }
 
   const setList = (title, listType) => {
@@ -27,7 +27,7 @@ const base = () => {
       id: crypto.randomUUID(),
       todos: [],
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const setEverydayList = (title) => {
@@ -38,7 +38,7 @@ const base = () => {
       todos: [],
       startOfDay: format(setHours(startOfToday(), 8), 'HH:mm:ss yyyy/MM/dd'),
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const setStartOfDay = (hour) => {
@@ -47,7 +47,7 @@ const base = () => {
       setHours(startOfToday(), hour),
       'HH:mm:ss yyyy/MM/dd'
     )
-    _updateStorage()
+    updateStorage()
   }
 
   const timeUpdate = () => {
@@ -61,7 +61,7 @@ const base = () => {
         // eslint-disable-next-line no-param-reassign
         todo.checked = false
       })
-      _updateStorage()
+      updateStorage()
     }
   }
 
@@ -71,7 +71,7 @@ const base = () => {
     lists.forEach((list, i) => {
       if (list.id === listId) {
         lists.splice(i, 1)
-        _updateStorage()
+        updateStorage()
       }
     })
   }
@@ -80,7 +80,7 @@ const base = () => {
     lists.forEach((list, i) => {
       if (list.id === listId) {
         lists[i] = newList
-        _updateStorage()
+        updateStorage()
       }
     })
   }
@@ -89,7 +89,7 @@ const base = () => {
     lists.forEach((list, i) => {
       if (list.id === listId) {
         lists[i].name = newTitle
-        _updateStorage()
+        updateStorage()
       }
     })
   }
@@ -97,7 +97,7 @@ const base = () => {
   const addTodo = (listId, newTodo) => {
     const list = lists.find((li) => li.id === listId)
     list.todos.push(newTodo)
-    _updateStorage()
+    updateStorage()
   }
 
   const getTodo = (listId, todoId) => {
@@ -112,7 +112,7 @@ const base = () => {
         list.todos.splice(i, 1)
       }
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const changeTodo = (listId, todoId, newTodo) => {
@@ -122,7 +122,7 @@ const base = () => {
         list.todos[i] = newTodo
       }
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const setNotes = () => {
@@ -132,13 +132,13 @@ const base = () => {
       id: crypto.randomUUID(),
       notes: [],
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const addNote = (newNote) => {
     const list = lists.find((li) => li.type === 'notes')
     list.notes.push(newNote)
-    _updateStorage()
+    updateStorage()
   }
 
   const getNote = (noteId) => {
@@ -153,7 +153,7 @@ const base = () => {
         list.notes.splice(i, 1)
       }
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const changeNote = (noteId, newNote) => {
@@ -163,7 +163,7 @@ const base = () => {
         list.notes[i] = newNote
       }
     })
-    _updateStorage()
+    updateStorage()
   }
 
   const sort = (listId, type) => {
@@ -197,7 +197,7 @@ const base = () => {
       default:
         break
     }
-    _updateStorage()
+    updateStorage()
   }
 
   const sortByIds = (listId, ...ids) => {
@@ -212,6 +212,7 @@ const base = () => {
 
   const publicMethods = {
     lists,
+    updateStorage,
     setList,
     getList,
     setEverydayList,
