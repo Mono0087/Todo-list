@@ -22,9 +22,16 @@ const _createDefaultListEl = (list) => {
       { dataKey: 'dragAndDrop', dataValue: list.type === 'default' },
     ]
   )
+
+  const todosAmountEl = `<span class="todos-amount">${
+    list.todos.length || ''
+  }</span>`
+
   listEl.insertAdjacentHTML(
     'afterbegin',
-    `<button class="default-list-list-item_btn" data-nav-el="list-item-btn">${list.name}</button>`
+    `<button class="default-list-list-item_btn" data-nav-el="list-item-btn">${
+      list.name
+    } ${list.type === 'everyday' ? '⟳' : todosAmountEl}</button>`
   )
   return listEl
 }
@@ -34,10 +41,13 @@ const _createCustomListEl = (list) => {
   listEl.classList.add(`${list.type}-list-item`)
   listEl.dataset.listId = list.id
   listEl.dataset.dragAndDrop = true
+  const todosAmountEl = `<span class="todos-amount">${
+    list.todos.length || ''
+  }</span>`
   listEl.insertAdjacentHTML(
     'afterbegin',
     `<button class="custom-list-item_btn list-item_btn" data-nav-el="list-item-btn">
-          ${list.name}
+          ${list.name} ${todosAmountEl}
         </button>
         <div class="list_dropdown-menu" data-dropdown>
           <button class="dropdown-btn" data-dropdown-btn>
@@ -70,7 +80,7 @@ const _createNotesListEl = (list) => {
     [`${list.type}-list-item`],
     null,
     null,
-    'Notes',
+    'Notes ✎',
     [
       { dataKey: 'notesEl', dataValue: '' },
       { dataKey: 'navEl', dataValue: 'list-item-btn' },
@@ -157,7 +167,7 @@ const _renderEverydayListEl = (list) => {
   main.insertAdjacentHTML(
     'afterbegin',
     `<div class="list-container everyday-list-container" data-list-container>
-      <h2 id="list-title">Everyday</h2>
+      <h2 id="list-title">Everyday ⟳</h2>
       <btn class="btn" id="start-time-btn" data-list-el="set-start-hour">Set start of the day</btn>
       <p id="start-of-day-info">Tasks for today - ${format(
     list.startOfDay,
@@ -264,6 +274,36 @@ const _renderNotesListEl = (list) => {
   )
 }
 
+const _updateLists = () => {
+  const defaultListsContainer = nav.querySelector('[data-default-lists]')
+  const customListsContainer = nav.querySelector('[data-custom-lists]')
+  const notesBtn = nav.querySelector('[data-notes-el]')
+  defaultListsContainer.innerHTML = ''
+  customListsContainer.innerHTML = ''
+  if (notesBtn) notesBtn.remove()
+
+  app.lists.forEach((list) => {
+    switch (list.type) {
+      case 'custom': {
+        const listEl = _createCustomListEl(list)
+        customListsContainer.appendChild(listEl)
+        break
+      }
+      case 'notes': {
+        const noteEl = _createNotesListEl(list)
+        nav.appendChild(noteEl)
+        break
+      }
+      default:
+        {
+          const listEl = _createDefaultListEl(list)
+          defaultListsContainer.appendChild(listEl)
+        }
+        break
+    }
+  })
+}
+
 const _sortTodosByIDS = (todosContainer) => {
   const todos = todosContainer.querySelectorAll('[data-todo-element]')
   const ids = []
@@ -339,6 +379,7 @@ const _addDraggableEvents = () => {
         app.addTodo(newListId, todo)
         app.deleteTodo(currentListId, todoId)
         _renderListEl(app.getList(currentListId))
+        _updateLists()
         return
       }
       if (currentDropTargetLi) {
@@ -368,33 +409,7 @@ const _renderList = (listId = currentListId) => {
 
 const DOM = {
   updateLists() {
-    const defaultListsContainer = nav.querySelector('[data-default-lists]')
-    const customListsContainer = nav.querySelector('[data-custom-lists]')
-    const notesBtn = nav.querySelector('[data-notes-el]')
-    defaultListsContainer.innerHTML = ''
-    customListsContainer.innerHTML = ''
-    if (notesBtn) notesBtn.remove()
-
-    app.lists.forEach((list) => {
-      switch (list.type) {
-        case 'custom': {
-          const listEl = _createCustomListEl(list)
-          customListsContainer.appendChild(listEl)
-          break
-        }
-        case 'notes': {
-          const noteEl = _createNotesListEl(list)
-          nav.appendChild(noteEl)
-          break
-        }
-        default:
-          {
-            const listEl = _createDefaultListEl(list)
-            defaultListsContainer.appendChild(listEl)
-          }
-          break
-      }
-    })
+    _updateLists()
   },
 
   renderList(listId = currentListId) {
@@ -403,11 +418,13 @@ const DOM = {
 
   addTodo(todo) {
     app.addTodo(currentListId, todo)
+    this.updateLists()
     _renderList()
   },
 
   deleteTodo(todoId) {
     app.deleteTodo(currentListId, todoId)
+    this.updateLists()
     _renderList()
   },
 

@@ -527,13 +527,13 @@ const settingsModal = {
 
   closeForm() {
     _hideOverlay()
-    window.location.reload()
     overlay.innerHTML = ''
   },
-
+  
   checkForm(Event) {
     Event.preventDefault()
     this.closeForm()
+    window.location.reload()
   },
 }
 
