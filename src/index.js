@@ -4,6 +4,7 @@ import DOM from './app/modules/DOM'
 import {
   listForm,
   renameListForm,
+  deleteListConfirmForm,
   todoForm,
   changeTodoForm,
   everydayTodoForm,
@@ -35,9 +36,7 @@ const navClickHandler = (Event) => {
       break
     case 'delete-list-btn': {
       const { listId } = Event.target.closest('[data-list-id]').dataset
-      app.deleteList(listId)
-      DOM.updateLists()
-      DOM.renderList()
+      deleteListConfirmForm.showForm(listId)
       break
     }
     case 'rename-list-btn': {

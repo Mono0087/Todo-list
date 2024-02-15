@@ -119,6 +119,11 @@ const _renderListEl = (list) => {
                 Done first ✔️
               </button>
             </li>
+            <li>
+              <button data-list-el="sort" data-sort-type="deadline">
+                Deadline ⏰
+              </button>
+            </li>
           </ul>
           </div>
         </li>

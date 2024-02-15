@@ -140,6 +140,44 @@ const renameListForm = {
   },
 }
 
+const deleteListConfirmForm = {
+  showForm(listId) {
+    this.listId = listId
+    const formEl = document.createElement('form')
+    formEl.classList.add('delete-list-confirm-form')
+    formEl.id = 'pop-up-form'
+    formEl.action = 'post'
+    formEl.insertAdjacentHTML(
+      'afterbegin',
+      `<h2>Are you sure you want to delete this list?</h2>
+       <button
+         class="btn"
+         type="submit"
+       >
+         Delete
+       </button>`
+    )
+    formEl.addEventListener('submit', this.checkForm.bind(this))
+    overlay.appendChild(formEl)
+    _showOverlay()
+    _handleOverlayClick(this)
+  },
+
+  closeForm() {
+    _hideOverlay()
+    overlay.innerHTML = ''
+    DOM.renderList()
+  },
+
+  checkForm(Event) {
+    Event.preventDefault()
+    app.deleteList(this.listId)
+    DOM.updateLists()
+    DOM.renderList()
+    this.closeForm()
+  },
+}
+
 const todoForm = {
   showForm() {
     const formEl = document.createElement('form')
@@ -466,12 +504,13 @@ const settingsModal = {
           <label for="import-export-input">Copy/past this text for import/export:</label>
           <div class="import-export-container">
             <textarea id="import-export-input" name="import/export">${JSON.stringify(
-    app.lists
-  )}</textarea>
+              app.lists
+            )}</textarea>
             <span id="copy-message">Copied!</span>
           </div>
-          <button class="export-btn btn" data-export-btn>Copy file↗</button>
-          <button class="save-import-btn btn" data-import-btn data-title="Make sure you are putting the data in the correct format!">Save file💾</button>
+          <button class="import-btn btn" data-import-btn>Paste↘</button>
+          <button class="export-btn btn" data-export-btn>Copy↗</button>
+          <button class="save-import-btn btn" data-save-import-btn data-title="Make sure you are putting the data in the correct format!">Save💾</button>
         </fieldset>
         <button
           class="btn"
@@ -486,10 +525,20 @@ const settingsModal = {
     const closeBtn = formEl.querySelector('[data-close-settings-btn]')
     const exportBtn = formEl.querySelector('[data-export-btn]')
     const importBtn = formEl.querySelector('[data-import-btn]')
+    const saveImportBtn = formEl.querySelector('[data-save-import-btn]')
 
     closeBtn.addEventListener('click', (Event) => {
       Event.preventDefault()
       this.closeForm()
+    })
+
+    importBtn.addEventListener('click', (Event) => {
+      Event.preventDefault()
+      const textInput = formEl.querySelector('[name="import/export"]')
+      navigator.clipboard
+        .readText()
+        // eslint-disable-next-line no-return-assign
+        .then((clipText) => (textInput.innerHTML = clipText))
     })
 
     exportBtn.addEventListener('click', (Event) => {
@@ -504,7 +553,7 @@ const settingsModal = {
       }, 5000)
     })
 
-    importBtn.addEventListener('click', (Event) => {
+    saveImportBtn.addEventListener('click', (Event) => {
       Event.preventDefault()
       const listsData = formEl.querySelector('[name="import/export"]')
       try {
@@ -515,10 +564,10 @@ const settingsModal = {
       }
 
       if (Array.isArray(JSON.parse(listsData.value))) {
-        importBtn.dataset.title = 'Saved!'
+        saveImportBtn.dataset.title = 'Saved!'
         app.updateStorage(JSON.parse(listsData.value))
         setTimeout(() => {
-          importBtn.dataset.title =
+          saveImportBtn.dataset.title =
             'Make sure you are putting the data in the correct format!'
         }, 5000)
         return
@@ -546,6 +595,7 @@ const settingsModal = {
 export {
   listForm,
   renameListForm,
+  deleteListConfirmForm,
   todoForm,
   changeTodoForm,
   everydayTodoForm,

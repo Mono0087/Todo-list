@@ -194,6 +194,14 @@ const base = () => {
         changeList(listId, list)
         break
       }
+      case 'deadline': {
+        list.todos.sort((curr, next) => {
+          if (isBefore(curr.dueDate, next.dueDate)) return -1
+          if (!isBefore(curr.dueDate, next.dueDate)) return 1
+        })
+        changeList(listId, list)
+        break
+      }
       default:
         break
     }
