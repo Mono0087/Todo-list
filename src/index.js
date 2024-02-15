@@ -115,7 +115,7 @@ if (app.lists.length === 0) {
 }
 app.timeUpdate()
 DOM.updateLists()
-DOM.renderList(app.lists[0].id)
+DOM.renderList(app.lists[2].id)
 
 // BIND EVENTS ///////////////////////////////////////////////////////////
 nav.addEventListener('click', navClickHandler)

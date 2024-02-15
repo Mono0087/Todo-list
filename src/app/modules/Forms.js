@@ -483,8 +483,14 @@ const settingsModal = {
     )
     formEl.addEventListener('submit', this.checkForm.bind(this))
 
+    const closeBtn = formEl.querySelector('[data-close-settings-btn]')
     const exportBtn = formEl.querySelector('[data-export-btn]')
     const importBtn = formEl.querySelector('[data-import-btn]')
+
+    closeBtn.addEventListener('click', (Event) => {
+      Event.preventDefault()
+      this.closeForm()
+    })
 
     exportBtn.addEventListener('click', (Event) => {
       Event.preventDefault()
@@ -529,7 +535,7 @@ const settingsModal = {
     _hideOverlay()
     overlay.innerHTML = ''
   },
-  
+
   checkForm(Event) {
     Event.preventDefault()
     this.closeForm()

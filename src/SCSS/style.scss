@@ -115,7 +115,7 @@ a {
   text-overflow: ellipsis;
   white-space: normal;
   overflow: hidden;
-  word-wrap: break-word;
+  word-break: break-all;
 }
 
 // STYLES ////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ a {
   header {
     grid-area: header;
     background-color: $main-theme;
-    border-bottom: 2px solid $border;
+    border-bottom: 2px solid #846161;
     position: relative;
     @extend %flex-column-rules, %padding;
     h1 {
@@ -166,6 +166,9 @@ a {
   }
   #default-projects {
     font-size: calc(clamp(1.2rem, 1vw, 40px));
+    li span {
+      right: auto;
+    }
   }
   .projects-list {
     border-bottom: 2px dashed rgb(153, 94, 94);
@@ -183,18 +186,21 @@ a {
   .projects-list li {
     display: flex;
     justify-content: space-between;
-    gap: 15px;
+    gap: 3ch;
     position: relative;
     & span {
       position: absolute;
-      z-index: 100;
-      top: 0;
+      z-index: 1;
+      top: -5px;
+      right: -13px;
       transform: translateX(40%);
       font-weight: bold;
       color: rgba(159, 64, 64, 0.565);
       font-size: 0.8em;
     }
     .custom-list-item_btn {
+      position: relative;
+      overflow: visible;
       text-align: left;
       @extend %text-overflow;
     }
@@ -203,8 +209,8 @@ a {
       .dropdown-btn {
         display: flex;
         gap: 5px;
-        height: 100%;
-        align-items: center;
+        height: 1ch;
+        transform: translateY(1ch);
         .btn-dot {
           pointer-events: none;
           width: 4px;
@@ -215,11 +221,11 @@ a {
       }
       .dropdown-content {
         position: absolute;
-        transform: translateX(-75%);
+        transform: translateX(-80%) translateY(1ch);
         flex-direction: column;
         display: none;
         padding: 10px;
-        z-index: 1;
+        z-index: 2;
         gap: 5px;
         border-radius: 5px;
         background-color: $bg-main;
@@ -246,7 +252,7 @@ a {
     background-color: rgb(209, 133, 133);
     padding: 5px;
     border-radius: 15px;
-    &.todo-item{
+    &.todo-item {
       border: none;
     }
   }
@@ -268,6 +274,9 @@ a {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        h2 {
+          @extend %text-overflow;
+        }
       }
     }
     .sort_dropdown-menu {
@@ -311,8 +320,9 @@ a {
     }
     .todos-container {
       @extend %flex-column-rules;
-      gap: 10px;
+      gap: 0;
       width: 100%;
+      border-radius: 5px;
       padding-right: 15px;
     }
 
@@ -328,7 +338,8 @@ a {
         margin-left: auto;
       }
       input {
-        border: 3px solid $main-theme-light;
+        border: 2px solid $main-theme-light;
+        outline: 3px solid $bg-main;
         border-radius: 10px;
         padding: 5px;
       }
@@ -391,11 +402,11 @@ a {
     }
     .todo-item {
       position: relative;
-      &::before{
+      &::before {
         content: '>';
         position: absolute;
         top: 7px;
-        left: -15px;
+        left: -17px;
       }
       width: 100%;
       margin-left: 15px;
@@ -414,6 +425,7 @@ a {
     }
     .todo-container {
       flex-wrap: wrap;
+      padding-bottom: 10px;
     }
     .todo_top-container {
       width: 100%;
@@ -435,7 +447,10 @@ a {
       font-size: calc(clamp(1.2rem, 1.2vw, 38px));
     }
     .checked {
-      text-decoration: 2px line-through $border;
+      .todo-title {
+        opacity: 40%;
+        text-decoration: 2px line-through $border;
+      }
     }
     .delete-todo-btn,
     .change-todo-btn,
@@ -521,7 +536,7 @@ a {
   left: 50vw;
   transform: translate(-50%, -50%);
   margin-left: 0;
-  width: clamp(fit-content, 30vw, 600px);
+  width: calc(max(20vw, 30ch));
   @extend %padding, %flex-column-rules;
   gap: 5px;
   z-index: 1;
@@ -532,6 +547,10 @@ a {
   input,
   textarea {
     width: 100%;
+    border: none;
+    border-radius: 3px;
+    box-shadow: 1px 0px 1px #d9d5d5, 0px 1px 1px #d9d5d5, 2px 1px 1px #d9d5d5,
+      1px 2px 1px #d9d5d5;
     border-radius: 5px;
     padding: 3px 5px;
     margin: 0 0 15px;
@@ -574,13 +593,13 @@ a {
   textarea[name='details'] {
     resize: vertical;
     height: 15ch;
-    width: 35ch;
     max-height: 30ch;
   }
   textarea[name='import/export'] {
     resize: vertical;
     height: 25ch;
     min-height: 10ch;
+    max-height: 30ch;
     margin: 0;
     border-radius: 10px;
     position: relative;
@@ -653,9 +672,13 @@ a {
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */
     nav .projects-list .custom-list-item {
-      flex-direction: row-reverse;
-      justify-content: start;
-      gap: 10px;
+      justify-content: space-between;
+      .list_dropdown-menu {
+        .dropdown-btn {
+          gap: 5px;
+          height: fit-content;
+        }
+      }
     }
     main {
       padding-right: 15px;

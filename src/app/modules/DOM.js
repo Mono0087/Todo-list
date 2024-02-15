@@ -24,7 +24,7 @@ const _createDefaultListEl = (list) => {
   )
 
   const todosAmountEl = `<span class="todos-amount">${
-    list.todos.length || ''
+    list.todos.filter((todo) => !todo.checked).length || ''
   }</span>`
 
   listEl.insertAdjacentHTML(
@@ -42,7 +42,7 @@ const _createCustomListEl = (list) => {
   listEl.dataset.listId = list.id
   listEl.dataset.dragAndDrop = true
   const todosAmountEl = `<span class="todos-amount">${
-    list.todos.length || ''
+    list.todos.filter((todo) => !todo.checked).length || ''
   }</span>`
   listEl.insertAdjacentHTML(
     'afterbegin',
@@ -135,14 +135,14 @@ const _renderListEl = (list) => {
   const todosContainer = main.querySelector('[data-todos-container]')
   list.todos.forEach((todo) => {
     const todoEl = `
-    <li class="todo-item" data-todo-li>
+    <li class="todo-item ${todo.checked ? 'checked' : ''}" data-todo-li>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
   todo.id
 }">
         <div class="todo_top-container">
-          <button class="todo-title ${
-  todo.checked ? 'checked' : ''
-}" data-list-el="todo-title">${todo.title}</button>
+          <button class="todo-title" data-list-el="todo-title">${
+  todo.title
+}</button>
           <div class="todo-info-container">
             <span class="todo-date">${todo.dueDate}</span>
             <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
@@ -182,7 +182,9 @@ const _renderEverydayListEl = (list) => {
   const todosContainer = main.querySelector('[data-todos-container]')
   list.todos.forEach((todo) => {
     const todoEl = `
-    <li class="todo-item" data-todo-li data-everyday-todo>
+    <li class="todo-item ${
+  todo.checked ? 'checked' : ''
+}" data-todo-li data-everyday-todo>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
   todo.id
 }">
@@ -448,6 +450,7 @@ const DOM = {
     todo.checked = !todo.checked
     app.changeTodo(currentListId, todoId, todo)
     _renderList()
+    _updateLists()
   },
 
   getCurrentListId() {
