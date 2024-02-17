@@ -142,12 +142,12 @@ const _renderListEl = (list) => {
     const todoEl = `
     <li class="todo-item ${todo.checked ? 'checked' : ''}" data-todo-li>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
-  todo.id
-}">
+        todo.id
+      }">
         <div class="todo_top-container">
           <button class="todo-title" data-list-el="todo-title">${
-  todo.title
-}</button>
+            todo.title
+          }</button>
           <div class="todo-info-container">
             <span class="todo-date">${todo.dueDate}</span>
             <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
@@ -175,9 +175,9 @@ const _renderEverydayListEl = (list) => {
       <h2 id="list-title">Everyday ⟳</h2>
       <btn class="btn" id="start-time-btn" data-list-el="set-start-hour">Set start of the day</btn>
       <p id="start-of-day-info">Tasks for today - ${format(
-    list.startOfDay,
-    'dd/MM/yyyy HH:mm'
-  )}</p>
+        list.startOfDay,
+        'dd/MM/yyyy HH:mm'
+      )}</p>
       <ul class="todos-container" data-todos-container>
       </ul>
       <button class="btn" id="add-todo-btn" data-list-el="add-everyday-todo">Add task</button>
@@ -188,14 +188,14 @@ const _renderEverydayListEl = (list) => {
   list.todos.forEach((todo) => {
     const todoEl = `
     <li class="todo-item ${
-  todo.checked ? 'checked' : ''
-}" data-todo-li data-everyday-todo>
+      todo.checked ? 'checked' : ''
+    }" data-todo-li data-everyday-todo>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
-  todo.id
-}">
+        todo.id
+      }">
         <button class="todo-title ${
-  todo.checked ? 'checked' : ''
-}" data-list-el="todo-title">${todo.title}</button>
+          todo.checked ? 'checked' : ''
+        }" data-list-el="todo-title">${todo.title}</button>
         <div class="todo-info-container">
           <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
           <button class="btn change-todo-btn" data-list-el="change-everyday-todo">✎</button>
@@ -224,13 +224,14 @@ const _renderNotesListEl = (list) => {
 
   const _createNoteElement = (note) => {
     const noteEl = `
-    <li class="note-item" data-note-id="${note.id}">
+    <li class="note-item" data-note-id="${note.id}" draggable="true">
       <div class="note-container" data-note-element>
         <button class="btn delete-note-btn" data-list-el="delete-note">✗</button>
-      <div class="note-info-container">
-        <input class="note-title" name="title" data-list-el="note-title" value="${note.title}">
-        <textarea name="details">${note.details}</textarea>
+        <div class="note-info-container">
+          <input class="note-title" name="title" data-list-el="note-title" value="${note.title}">
+          <textarea name="details">${note.details}</textarea>
         </div>
+        <button class="note-expand-btn" data-note-expand-btn>|||</button>
       </div>
     </li>`
     return noteEl
@@ -239,6 +240,17 @@ const _renderNotesListEl = (list) => {
   const notesContainer = main.querySelector('[data-notes-container]')
   list.notes.forEach((note) => {
     notesContainer.insertAdjacentHTML('beforeend', _createNoteElement(note))
+  })
+
+  notesContainer.addEventListener('click', (Event) => {
+    if (Event.target.hasAttribute('data-note-expand-btn')) {
+      const targetNote = Event.target.closest('[data-note-id]')
+      ;[...notesContainer.children].forEach((el) => {
+        if (el === targetNote) return
+        el.classList.remove('expanded-item')
+      })
+      targetNote.classList.toggle('expanded-item')
+    }
   })
 
   const _filterNotes = (Event) => {

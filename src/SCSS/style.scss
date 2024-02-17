@@ -353,7 +353,6 @@ a {
       gap: 15px;
       width: 100%;
       padding-right: 15px;
-
       .note-item {
         color: #000;
         background-color: $bg-main;
@@ -363,6 +362,13 @@ a {
         position: relative;
         padding: 15px 10px;
         height: max-content;
+        &.expanded-item {
+          grid-column: span 2;
+          grid-row: span 2;
+          textarea {
+            height: 130ch;
+          }
+        }
         .delete-note-btn {
           border-radius: 15px;
           width: 30px;
@@ -385,10 +391,21 @@ a {
           width: 100%;
         }
         textarea {
-          resize: vertical;
+          resize: none;
           width: 100%;
           min-height: 15ch;
-          max-height: 30ch;
+          max-height: 40ch;
+        }
+        .note-expand-btn {
+          position: absolute;
+          bottom: -5px;
+          left: 50%;
+          transform: translateY(50%);
+          color: $main-theme-light;
+          background-color: transparent;
+          rotate: 90deg;
+          width: 24px;
+          height: 24px;
         }
       }
     }
@@ -466,6 +483,7 @@ a {
         @extend %text-overflow;
         white-space: pre-wrap;
         font-size: calc(clamp(0.9rem, 1vw, 30px));
+        padding-bottom: 5px;
         max-width: 60ch;
       }
       .checked {
@@ -633,12 +651,12 @@ a {
   }
 }
 
-.delete-list-confirm-form{
+.delete-list-confirm-form {
   text-align: center;
-  h2{
+  h2 {
     line-height: 1.2;
   }
-  button{
+  button {
     margin-left: auto;
     margin-right: auto;
   }
@@ -702,10 +720,22 @@ a {
 }
 
 @media (max-width: 425px) {
-  #pop-up-form {
-    width: 80vw;
-    textarea {
-      width: 100%;
+  .container {
+    main {
+      #pop-up-form {
+        width: 80vw;
+        textarea {
+          width: 100%;
+        }
+      }
+      .notes-container {
+        grid-template-columns: 100%;
+        .note-item {
+          &.expanded-item {
+            grid-column: span 1;
+          }
+        }
+      }
     }
   }
 }

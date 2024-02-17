@@ -504,8 +504,8 @@ const settingsModal = {
           <label for="import-export-input">Copy/past this text for import/export:</label>
           <div class="import-export-container">
             <textarea id="import-export-input" name="import/export">${JSON.stringify(
-              app.lists
-            )}</textarea>
+    app.lists
+  )}</textarea>
             <span id="copy-message">Copied!</span>
           </div>
           <button class="import-btn btn" data-import-btn>Paste↘</button>
