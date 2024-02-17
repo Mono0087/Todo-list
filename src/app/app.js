@@ -210,6 +210,15 @@ const base = () => {
 
   const sortByIds = (listId, ...ids) => {
     const list = { ...getList(listId) }
+    if (list.type === 'notes') {
+      const notes = []
+      list.notes.forEach((note, i) => {
+        notes.push(getNote(ids[i]))
+      })
+      list.notes = notes
+      changeList(listId, list)
+      return
+    }
     const todos = []
     list.todos.forEach((todo, i) => {
       todos.push(getTodo(listId, ids[i]))

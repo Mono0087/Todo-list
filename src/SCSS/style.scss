@@ -164,6 +164,9 @@ a {
     h2 {
       font-size: calc(clamp(1.5rem, 1.4vw, 40px));
     }
+    .drag-over{
+      padding: 5px;
+    }
   }
   #default-projects {
     font-size: calc(clamp(1.2rem, 1vw, 40px));
@@ -249,9 +252,8 @@ a {
     font-size: calc(clamp(1.2rem, 1vw, 40px));
   }
   .drag-over {
-    border: 3px dashed red;
+    outline: 3px dashed red;
     background-color: rgb(209, 133, 133);
-    padding: 5px;
     border-radius: 15px;
     &.todo-item {
       border: none;
@@ -362,6 +364,12 @@ a {
         position: relative;
         padding: 15px 10px;
         height: max-content;
+        &.dragging{
+          border: none;
+        }
+        &.dragover{
+          outline: 2px dashed $bg-main;
+        }
         &.expanded-item {
           grid-column: span 2;
           grid-row: span 2;
@@ -415,7 +423,7 @@ a {
       opacity: 0.5;
     }
     .dragging {
-      border: 3px dashed red;
+      border: 2px dashed red;
       padding: 5px;
     }
     .todo-item {
@@ -443,6 +451,7 @@ a {
     }
     .todo-container {
       flex-wrap: wrap;
+      padding: 0 5px;
       padding-bottom: 10px;
     }
     .todo_top-container {
@@ -460,6 +469,7 @@ a {
       text-align: left;
       font-weight: 700;
       @extend %text-overflow;
+      word-break: normal;
       background-color: inherit;
       color: #fff;
       font-size: calc(clamp(1.2rem, 1.2vw, 38px));
@@ -481,6 +491,7 @@ a {
       flex-basis: 100%;
       p {
         @extend %text-overflow;
+      word-break: normal;
         white-space: pre-wrap;
         font-size: calc(clamp(0.9rem, 1vw, 30px));
         padding-bottom: 5px;

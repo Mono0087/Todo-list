@@ -91,6 +91,24 @@ const _createNotesListEl = (list) => {
   return listEl
 }
 
+const _sortTodosByIDS = (todosContainer) => {
+  const todos = todosContainer.querySelectorAll('[data-todo-element]')
+  const ids = []
+  ;[...todos].forEach((todo) => {
+    ids.push(todo.dataset.todoId)
+  })
+  app.sortByIds(currentListId, ...ids)
+}
+
+const _sortNotesByIDS = (notesContainer) => {
+  const notes = notesContainer.querySelectorAll('[data-note-item]')
+  const ids = []
+  ;[...notes].forEach((note) => {
+    ids.push(note.dataset.noteId)
+  })
+  app.sortByIds(currentListId, ...ids)
+}
+
 const _renderListEl = (list) => {
   currentListId = list.id
   main.innerHTML = ''
@@ -142,12 +160,12 @@ const _renderListEl = (list) => {
     const todoEl = `
     <li class="todo-item ${todo.checked ? 'checked' : ''}" data-todo-li>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
-        todo.id
-      }">
+  todo.id
+}">
         <div class="todo_top-container">
           <button class="todo-title" data-list-el="todo-title">${
-            todo.title
-          }</button>
+  todo.title
+}</button>
           <div class="todo-info-container">
             <span class="todo-date">${todo.dueDate}</span>
             <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
@@ -175,9 +193,9 @@ const _renderEverydayListEl = (list) => {
       <h2 id="list-title">Everyday ⟳</h2>
       <btn class="btn" id="start-time-btn" data-list-el="set-start-hour">Set start of the day</btn>
       <p id="start-of-day-info">Tasks for today - ${format(
-        list.startOfDay,
-        'dd/MM/yyyy HH:mm'
-      )}</p>
+    list.startOfDay,
+    'dd/MM/yyyy HH:mm'
+  )}</p>
       <ul class="todos-container" data-todos-container>
       </ul>
       <button class="btn" id="add-todo-btn" data-list-el="add-everyday-todo">Add task</button>
@@ -188,14 +206,14 @@ const _renderEverydayListEl = (list) => {
   list.todos.forEach((todo) => {
     const todoEl = `
     <li class="todo-item ${
-      todo.checked ? 'checked' : ''
-    }" data-todo-li data-everyday-todo>
+  todo.checked ? 'checked' : ''
+}" data-todo-li data-everyday-todo>
       <div class="todo-container" data-todo-element draggable="true" data-todo-id="${
-        todo.id
-      }">
+  todo.id
+}">
         <button class="todo-title ${
-          todo.checked ? 'checked' : ''
-        }" data-list-el="todo-title">${todo.title}</button>
+  todo.checked ? 'checked' : ''
+}" data-list-el="todo-title">${todo.title}</button>
         <div class="todo-info-container">
           <button class="btn delete-todo-btn" data-list-el="delete-todo">✗</button>
           <button class="btn change-todo-btn" data-list-el="change-everyday-todo">✎</button>
@@ -224,7 +242,7 @@ const _renderNotesListEl = (list) => {
 
   const _createNoteElement = (note) => {
     const noteEl = `
-    <li class="note-item" data-note-id="${note.id}" draggable="true">
+    <li class="note-item" data-note-item data-note-id="${note.id}" draggable="true">
       <div class="note-container" data-note-element>
         <button class="btn delete-note-btn" data-list-el="delete-note">✗</button>
         <div class="note-info-container">
@@ -238,8 +256,41 @@ const _renderNotesListEl = (list) => {
   }
 
   const notesContainer = main.querySelector('[data-notes-container]')
+
   list.notes.forEach((note) => {
     notesContainer.insertAdjacentHTML('beforeend', _createNoteElement(note))
+  })
+
+  const draggables = notesContainer.querySelectorAll('[data-note-item]')
+  let currDragNote
+  let currDropTargetNote
+  draggables.forEach((el) => {
+    el.addEventListener('dragstart', (Event) => {
+      currDragNote = el
+      el.classList.remove('expanded-item')
+      el.classList.add('dragging')
+      Event.dataTransfer.setDragImage(el.cloneNode(true), 0, 0)
+      setTimeout(() => {
+        el.classList.add('hide')
+      }, 0)
+    })
+
+    el.addEventListener('dragover', () => {
+      currDropTargetNote = el
+      el.classList.add('dragover')
+    })
+
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('dragover')
+    })
+
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging', 'hide')
+      if (currDropTargetNote) {
+        currDropTargetNote.insertAdjacentElement('beforeBegin', currDragNote)
+        _sortNotesByIDS(notesContainer)
+      }
+    })
   })
 
   notesContainer.addEventListener('click', (Event) => {
@@ -323,15 +374,6 @@ const _updateLists = () => {
   })
 }
 
-const _sortTodosByIDS = (todosContainer) => {
-  const todos = todosContainer.querySelectorAll('[data-todo-element]')
-  const ids = []
-  ;[...todos].forEach((todo) => {
-    ids.push(todo.dataset.todoId)
-  })
-  app.sortByIds(currentListId, ...ids)
-}
-
 const _addDraggableEvents = () => {
   const todosContainer = main.querySelector('[data-todos-container]')
   const draggables = [...todosContainer.querySelectorAll('[data-todo-element]')]
@@ -359,30 +401,22 @@ const _addDraggableEvents = () => {
     currentDropTargetLi = undefined
   })
 
-  todosContainer.addEventListener('dragover', (Event) => {
-    const target = Event.target.closest('[data-todo-li]')
-    if (target && target !== activeLI) {
-      target.classList.add('drag-over')
-      currentDropTargetLi = target
-    }
-  })
-
-  todosContainer.addEventListener('dragleave', (Event) => {
-    const target = Event.target.closest('[data-todo-li]')
-    if (target) {
-      target.classList.remove('drag-over')
-      return
-    }
-    currentDropTargetLi = undefined
-  })
-
   draggables.forEach((el) => {
     el.addEventListener('dragstart', () => {
-      activeLI = el.closest('[data-todo-li]')
+      activeLI = el
       el.classList.add('dragging')
       setTimeout(() => {
         el.classList.add('hide')
       }, 0)
+    })
+
+    el.addEventListener('dragover', () => {
+      currentDropTargetLi = el
+      el.classList.add( 'drag-over' )
+    })
+    
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('drag-over')
     })
 
     el.addEventListener('dragend', () => {
@@ -404,6 +438,7 @@ const _addDraggableEvents = () => {
       if (currentDropTargetLi) {
         currentDropTargetLi.insertAdjacentElement('beforeBegin', activeLI)
         _sortTodosByIDS(todosContainer)
+        _renderList()
       }
     })
   })
