@@ -164,7 +164,7 @@ a {
     h2 {
       font-size: calc(clamp(1.5rem, 1.4vw, 40px));
     }
-    .drag-over{
+    .drag-over {
       padding: 5px;
     }
   }
@@ -286,13 +286,14 @@ a {
       .dropdown-content {
         position: absolute;
         z-index: 1;
-        transform: translateX(-20%);
+        transform: translateX(-63%);
         flex-direction: column;
         display: none;
         padding: 10px;
         gap: 5px;
         li {
           border-bottom: 1px dotted $border;
+          white-space: nowrap;
           &:last-child {
             border-bottom: none;
           }
@@ -364,10 +365,10 @@ a {
         position: relative;
         padding: 15px 10px;
         height: max-content;
-        &.dragging{
+        &.dragging {
           border: none;
         }
-        &.dragover{
+        &.dragover {
           outline: 2px dashed $bg-main;
         }
         &.expanded-item {
@@ -491,11 +492,13 @@ a {
       flex-basis: 100%;
       p {
         @extend %text-overflow;
-      word-break: normal;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        -ms-word-break: break-word;
+        word-break: break-word;
         white-space: pre-wrap;
         font-size: calc(clamp(0.9rem, 1vw, 30px));
         padding-bottom: 5px;
-        max-width: 60ch;
       }
       .checked {
         display: none;
@@ -583,7 +586,7 @@ a {
       1px 2px 1px #d9d5d5;
     border-radius: 5px;
     padding: 3px 5px;
-    margin: 0 0 15px;
+    margin: 0 0 5px;
   }
   .import-export-container {
     position: relative;
@@ -622,7 +625,7 @@ a {
   }
   textarea[name='details'] {
     resize: vertical;
-    height: 15ch;
+    height: 10ch;
     max-height: 30ch;
   }
   textarea[name='import/export'] {
@@ -656,6 +659,10 @@ a {
   }
   #new-due-date {
     width: 15ch;
+    margin-bottom: 5px;
+  }
+  .date-options {
+    margin-bottom: 5px;
   }
   #new-priority {
     width: 5ch;

@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import app from '../app'
 import DOM from './DOM'
 import { Todo, CustomTodo, Note } from './Todo'
@@ -39,6 +39,16 @@ const _checkValidity = (formData) => {
     if (data[1] === '' && data[0] !== 'details') return false
   }
   return true
+}
+
+const _setTodayDueDate = () => {
+  const dueDateInput = overlay.querySelector('[data-due-date-input]')
+  dueDateInput.value = format(new Date(), 'yyyy-MM-dd')
+}
+
+const _setTomorrowDueDate = () => {
+  const dueDateInput = overlay.querySelector('[data-due-date-input]')
+  dueDateInput.value = format(addDays(new Date(), 1), 'yyyy-MM-dd')
 }
 
 const listForm = {
@@ -192,7 +202,11 @@ const todoForm = {
         <label for="new-details">Details(optional):</label>
         <textarea id="new-details" name="details"></textarea>
         <label for="new-due-date">Due date:</label>
-        <input id="new-due-date" name="dueDate" type="date" />
+        <input id="new-due-date" name="dueDate" data-due-date-input type="date" />
+        <div class="date-options">
+          <button class="btn" type="button" data-set-deadline-today>Today</button>
+          <button class="btn" type="button" data-set-deadline-tomorrow>Tomorrow</button>
+        </div>
         <label for="new-priority">Priority:</label>
         <input id="new-priority" name="priority" type="number" min="0" max="4" />
         <p class="error-para" data-error-para>All fields must be filled up!</p>
@@ -204,6 +218,14 @@ const todoForm = {
         </button>
       </form>`
     )
+    const todayDueDateBtn = formEl.querySelector('[data-set-deadline-today]')
+    const tomorrowDueDateBtn = formEl.querySelector(
+      '[data-set-deadline-tomorrow]'
+    )
+
+    todayDueDateBtn.addEventListener('click', _setTodayDueDate)
+    tomorrowDueDateBtn.addEventListener('click', _setTomorrowDueDate)
+
     formEl.addEventListener('submit', this.checkForm.bind(this))
     overlay.appendChild(formEl)
     _showOverlay()
@@ -254,7 +276,11 @@ const changeTodoForm = {
         <label for="new-details">Details(optional):</label>
         <textarea id="new-details" name="details">${todo.details}</textarea>
         <label for="new-due-date">Due date:</label>
-        <input id="new-due-date" name="dueDate" type="date" value="${formattedDate}" />
+        <input id="new-due-date" name="dueDate" data-due-date-input type="date" value="${formattedDate}" />
+        <div class="date-options">
+          <button class="btn" type="button" data-set-deadline-today>Today</button>
+          <button class="btn" type="button" data-set-deadline-tomorrow>Tomorrow</button>
+        </div>
         <label for="new-priority">Priority:</label>
         <input id="new-priority" name="priority" type="number" min="0" max="4" value="${todo.priority}" />
         <p class="error-para" data-error-para>All fields must be filled up!</p>
@@ -267,6 +293,15 @@ const changeTodoForm = {
       </form>`
     )
     formEl.addEventListener('submit', this.checkForm.bind(this))
+
+    const todayDueDateBtn = formEl.querySelector('[data-set-deadline-today]')
+    const tomorrowDueDateBtn = formEl.querySelector(
+      '[data-set-deadline-tomorrow]'
+    )
+
+    todayDueDateBtn.addEventListener('click', _setTodayDueDate)
+    tomorrowDueDateBtn.addEventListener('click', _setTomorrowDueDate)
+
     overlay.appendChild(formEl)
     _showOverlay()
     _handleOverlayClick(this)

@@ -412,9 +412,9 @@ const _addDraggableEvents = () => {
 
     el.addEventListener('dragover', () => {
       currentDropTargetLi = el
-      el.classList.add( 'drag-over' )
+      el.classList.add('drag-over')
     })
-    
+
     el.addEventListener('dragleave', () => {
       el.classList.remove('drag-over')
     })
