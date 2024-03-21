@@ -26,6 +26,7 @@ const base = () => {
       type: listType,
       id: crypto.randomUUID(),
       todos: [],
+      notes: 'Type something...',
     })
     updateStorage()
   }
@@ -36,6 +37,7 @@ const base = () => {
       type: 'everyday',
       id: crypto.randomUUID(),
       todos: [],
+      notes: 'Type something...',
       startOfDay: format(setHours(startOfToday(), 8), 'HH:mm:ss yyyy/MM/dd'),
     })
     updateStorage()
@@ -132,6 +134,12 @@ const base = () => {
       id: crypto.randomUUID(),
       notes: [],
     })
+    updateStorage()
+  }
+
+  const updateListNote = (listId, noteText) => {
+    const list = lists.find((li) => li.id === listId)
+    list.notes = noteText
     updateStorage()
   }
 
@@ -248,6 +256,7 @@ const base = () => {
     getNote,
     deleteNote,
     changeNote,
+    updateListNote,
   }
   return publicMethods
 }

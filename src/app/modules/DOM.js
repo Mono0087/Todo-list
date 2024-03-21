@@ -91,6 +91,34 @@ const _createNotesListEl = (list) => {
   return listEl
 }
 
+// Execute callback after wait.
+const _debounce = (callback, wait) => {
+  let timeout
+  return (...args) => {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      callback.apply(this, args)
+    }, wait)
+  }
+}
+
+const _createProjectsNotesListEl = (list) => {
+  const notesArea = createElement('div', null, 'project-notes-container')
+  notesArea.innerHTML = `
+  <h2>Notes for "${list.name}" list:</h2>
+  <textarea name="project-notes">${list.notes}</textarea>
+  `
+  main.append(notesArea)
+
+  notesArea.addEventListener(
+    'keyup',
+    _debounce((Event) => {
+      const noteText = Event.target.value
+      app.updateListNote(currentListId, noteText)
+    }, 500)
+  )
+}
+
 const _sortTodosByIDS = (todosContainer) => {
   const todos = todosContainer.querySelectorAll('[data-todo-element]')
   const ids = []
@@ -318,19 +346,9 @@ const _renderNotesListEl = (list) => {
   )
   searchNoteInput.addEventListener('input', _filterNotes)
 
-  const debounce = (callback, wait) => {
-    let timeout
-    return (...args) => {
-      clearTimeout(timeout)
-      timeout = setTimeout(() => {
-        callback.apply(this, args)
-      }, wait)
-    }
-  }
-
   notesContainer.addEventListener(
     'keyup',
-    debounce((Event) => {
+    _debounce((Event) => {
       const targetNote = Event.target.closest('[data-note-id]')
       const data = [...targetNote.querySelectorAll('input, textarea')].map(
         (el) => el.value
@@ -450,6 +468,7 @@ const _renderList = (listId = currentListId) => {
     case 'everyday':
       _renderEverydayListEl(list)
       _addDraggableEvents()
+      _createProjectsNotesListEl(list)
       break
     case 'notes':
       _renderNotesListEl(list)
@@ -457,6 +476,7 @@ const _renderList = (listId = currentListId) => {
     default:
       _renderListEl(list)
       _addDraggableEvents()
+      _createProjectsNotesListEl(list)
       break
   }
 }

@@ -264,13 +264,22 @@ a {
     display: flex;
     padding-right: 0;
     justify-content: center;
+    flex-wrap: wrap;
+    align-content: start;
+    gap: 5px;
     @extend %add-overflow, %padding;
-    .list-container {
+
+    .list-container,
+    #project-notes-container {
       width: calc(min(100%, 1600px));
-      height: fit-content;
       border-radius: 15px;
       background-color: $main-theme;
-      @extend %padding, %flex-column-rules;
+      @extend %flex-column-rules;
+    }
+
+    .list-container {
+      @extend %padding;
+      height: fit-content;
       align-items: start;
       .list-top {
         width: 100%;
@@ -282,6 +291,36 @@ a {
         }
       }
     }
+
+    #project-notes-container {
+      padding: 10px;
+      min-height: 30ch;
+      max-height: 40ch;
+      gap: 0;
+
+      ::-webkit-scrollbar {
+        width: 18px;
+        display: block;
+      }
+      /* Track */
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      h2 {
+        padding: 10px 10px;
+        margin: 0;
+      }
+      textarea {
+        height: 100%;
+        padding: 5px;
+        border-radius: 10px;
+        resize: none;
+        width: 100%;
+        box-shadow: 1px 0px 1px #d9d5d5, 0px 1px 1px #d9d5d5,
+          2px 1px 1px #d9d5d5, 3px 2px 1px #d9d5d5;
+      }
+    }
+
     .sort_dropdown-menu {
       .dropdown-content {
         position: absolute;
@@ -348,7 +387,6 @@ a {
         padding: 5px;
       }
     }
-
     .notes-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(20ch, 1fr));
